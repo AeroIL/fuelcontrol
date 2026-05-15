@@ -111,20 +111,19 @@
 					<span class="corner tr"></span>
 					<span class="corner bl"></span>
 					<span class="corner br"></span>
-					<!-- barcode zone label -->
-					<div class="barcode-zone">
-						<div class="barcode-box">
-							<!-- animated scan line -->
-							<div class="scan-line"></div>
-						</div>
-						<p class="barcode-label">מספר כרטיס / ברקוד</p>
+				<!-- number zone: bottom-left corner of the card -->
+				<div class="num-zone">
+					<div class="num-box">
+						<div class="scan-line"></div>
+					</div>
+					<p class="num-label">מספר כרטיס</p>
 					</div>
 				</div>
 				<div class="band side"></div>
 			</div>
 			<!-- bottom dark band -->
 			<div class="band bottom">
-				<p class="hint">כוון את הכרטיס כך שימלא את המסגרת הלבנה</p>
+				<p class="hint">כוון את הכרטיס כך שימלא את המסגרת<br>המספר (פינה שמאל-תחתית) יוצג בתיבה הירוקה</p>
 			</div>
 		</div>
 
@@ -183,7 +182,7 @@
 	.band { background: rgba(0,0,0,0.55); }
 	.band.top    { flex: 1; }
 	.band.bottom {
-		flex: 1;
+		flex: 1.2;
 		display: flex;
 		align-items: flex-start;
 		justify-content: center;
@@ -223,24 +222,23 @@
 	.corner.bl { bottom: -2px; left: -2px;    border-bottom-width: 3px; border-left-width: 3px;  border-bottom-left-radius: 10px; }
 	.corner.br { bottom: -2px; right: -2px;   border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 10px; }
 
-	/* ── barcode zone (bottom-third of the card) ── */
-	.barcode-zone {
+	/* ── number zone: bottom-LEFT corner of the card ── */
+	.num-zone {
 		position: absolute;
-		bottom: 12px;
-		left: 10px;
-		right: 10px;
+		bottom: 10px;
+		left: 10px;   /* bottom-left to match the real card */
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		align-items: flex-start;
 		gap: 4px;
 	}
 
-	.barcode-box {
-		width: 100%;
-		height: 32px;
-		border: 1.5px solid rgba(99,179,237,0.9);
+	.num-box {
+		width: 120px;
+		height: 28px;
+		border: 2px solid rgba(74,222,128,0.95);  /* green to stand out */
 		border-radius: 4px;
-		background: rgba(66,153,225,0.08);
+		background: rgba(74,222,128,0.08);
 		position: relative;
 		overflow: hidden;
 	}
@@ -250,9 +248,9 @@
 		position: absolute;
 		left: 0; right: 0;
 		height: 2px;
-		background: rgba(99,179,237,0.9);
-		animation: sweep 1.8s ease-in-out infinite;
-		box-shadow: 0 0 6px rgba(99,179,237,0.8);
+		background: rgba(74,222,128,0.9);
+		animation: sweep 1.6s ease-in-out infinite;
+		box-shadow: 0 0 6px rgba(74,222,128,0.8);
 	}
 	@keyframes sweep {
 		0%   { top: 0; }
@@ -260,21 +258,22 @@
 		100% { top: 0; }
 	}
 
-	.barcode-label {
+	.num-label {
 		font-size: 10px;
-		color: rgba(99,179,237,0.95);
+		color: rgba(74,222,128,0.95);
 		letter-spacing: 0.5px;
-		text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+		text-shadow: 0 1px 3px rgba(0,0,0,0.9);
 		white-space: nowrap;
 	}
 
 	/* hint text in bottom band */
 	.hint {
 		font-size: 12px;
-		color: rgba(255,255,255,0.75);
+		color: rgba(255,255,255,0.8);
 		text-align: center;
 		text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 		padding: 0 12px;
+		line-height: 1.4;
 	}
 
 	/* ── controls ── */
