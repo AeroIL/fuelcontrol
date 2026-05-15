@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, createEventDispatcher } from 'svelte';
+	import { onDestroy, createEventDispatcher, tick } from 'svelte';
 	import { BrowserMultiFormatReader } from '@zxing/library';
 
 	const dispatch = createEventDispatcher<{ scan: string }>();
@@ -10,48 +10,36 @@
 	let cameraError = '';
 	let cameraActive = false;
 	let lastResult = '';
-	// 'environment' = back camera, 'user' = front camera
 	let preferBack = true;
 
 	async function startCamera() {
 		cameraError = '';
-		reader = new BrowserMultiFormatReader();
+
+		if (!navigator?.mediaDevices?.getUserMedia) {
+			cameraError = 'הדפדפן אינו תומך בגישה למצלמה. נסה Chrome/Safari עדכני.';
+			return;
+		}
+
+		cameraActive = true;
+		// Wait for Svelte to show the video element before ZXing touches it
+		await tick();
+
+		const constraints: MediaStreamConstraints = {
+			video: preferBack
+				? { facingMode: { ideal: 'environment' } }
+				: { facingMode: 'user' }
+		};
 
 		try {
-			// List available video input devices via Web API
-			const allDevices = await navigator.mediaDevices.enumerateDevices();
-			const videoDevices = allDevices.filter((d) => d.kind === 'videoinput');
-
-			let deviceId: string | undefined;
-			if (preferBack) {
-				const back = videoDevices.find((d: MediaDeviceInfo) =>
-					/back|rear|environment/i.test(d.label)
-				);
-				deviceId = back?.deviceId ?? videoDevices[0]?.deviceId;
-			} else {
-				const front = videoDevices.find((d: MediaDeviceInfo) =>
-					/front|user|selfie/i.test(d.label)
-				);
-				deviceId = front?.deviceId ?? videoDevices[0]?.deviceId;
-			}
-
-			cameraActive = true;
-
-			// decodeFromVideoDevice streams to videoEl and calls cb on each decode
-			await reader.decodeFromVideoDevice(
-				deviceId ?? null,
-				videoEl,
-				(result) => {
-					if (!result) return;
-					const text = result.getText();
-					if (!text || text === lastResult) return;
-					lastResult = text;
-					const digits = text.replace(/\D/g, '');
-					if (digits.length >= 5) {
-						dispatch('scan', digits);
-					}
-				}
-			);
+			reader = new BrowserMultiFormatReader();
+			await reader.decodeFromConstraints(constraints, videoEl, (result) => {
+				if (!result) return;
+				const text = result.getText();
+				if (!text || text === lastResult) return;
+				lastResult = text;
+				const digits = text.replace(/\D/g, '');
+				if (digits.length >= 5) dispatch('scan', digits);
+			});
 		} catch (e: unknown) {
 			const err = e as Error;
 			cameraActive = false;
@@ -59,8 +47,10 @@
 				cameraError = 'הגישה למצלמה נדחתה. אנא אשר גישה בהגדרות הדפדפן.';
 			} else if (err.name === 'NotFoundError') {
 				cameraError = 'לא נמצאה מצלמה במכשיר זה.';
+			} else if (err.name === 'NotReadableError') {
+				cameraError = 'המצלמה בשימוש על ידי אפליקציה אחרת.';
 			} else {
-				cameraError = 'שגיאה בפתיחת המצלמה.';
+				cameraError = `שגיאה: ${err.message || 'לא ניתן לפתוח מצלמה'}`;
 				console.error(err);
 			}
 		}
@@ -69,6 +59,11 @@
 	function stopCamera() {
 		reader?.reset();
 		reader = null;
+		// Also stop any tracks still attached to the video element
+		if (videoEl?.srcObject) {
+			(videoEl.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
+			videoEl.srcObject = null;
+		}
 		cameraActive = false;
 		lastResult = '';
 	}
@@ -79,12 +74,19 @@
 		await startCamera();
 	}
 
-	onDestroy(() => {
-		stopCamera();
-	});
+	onDestroy(() => stopCamera());
 </script>
 
+<!-- Single video element always in DOM so videoEl never gets rebound -->
 <div class="scanner-wrapper">
+	<video
+		bind:this={videoEl}
+		class="video-feed"
+		class:hidden={!cameraActive}
+		playsinline
+		muted
+	></video>
+
 	{#if !cameraActive}
 		<div class="camera-placeholder">
 			<div class="camera-icon">📷</div>
@@ -95,25 +97,14 @@
 			{/if}
 		</div>
 	{:else}
-		<div class="camera-view">
-			<!-- ZXing controls the video element directly -->
-			<video bind:this={videoEl} class="video-feed" playsinline muted></video>
-
-			<div class="scan-overlay">
-				<div class="scan-frame"></div>
-				<p class="scan-hint">כוון את הברקוד של הכרטיס אל תוך המסגרת</p>
-			</div>
-
-			<div class="camera-controls">
-				<button class="btn-icon" on:click={flipCamera} title="הפוך מצלמה">🔄</button>
-				<button class="btn-secondary" on:click={stopCamera}>סגור מצלמה</button>
-			</div>
+		<div class="scan-overlay">
+			<div class="scan-frame"></div>
+			<p class="scan-hint">כוון את הברקוד של הכרטיס אל תוך המסגרת</p>
 		</div>
-	{/if}
-
-	<!-- Always bind videoEl so ZXing can reference it -->
-	{#if !cameraActive}
-		<video bind:this={videoEl} class="video-feed hidden" playsinline muted></video>
+		<div class="camera-controls">
+			<button class="btn-icon" on:click={flipCamera} title="הפוך מצלמה">🔄</button>
+			<button class="btn-secondary" on:click={stopCamera}>סגור מצלמה</button>
+		</div>
 	{/if}
 </div>
 
@@ -123,6 +114,18 @@
 		border-radius: var(--radius);
 		overflow: hidden;
 		background: #111;
+		position: relative;
+	}
+
+	.video-feed {
+		width: 100%;
+		display: block;
+		max-height: 320px;
+		object-fit: cover;
+	}
+
+	.video-feed.hidden {
+		display: none;
 	}
 
 	.camera-placeholder {
@@ -145,23 +148,6 @@
 		color: #a0aec0;
 		font-size: 14px;
 		text-align: center;
-	}
-
-	.camera-view {
-		position: relative;
-		width: 100%;
-		background: #000;
-	}
-
-	.video-feed {
-		width: 100%;
-		display: block;
-		max-height: 320px;
-		object-fit: cover;
-	}
-
-	.video-feed.hidden {
-		display: none;
 	}
 
 	.scan-overlay {
