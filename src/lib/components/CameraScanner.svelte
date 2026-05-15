@@ -111,7 +111,7 @@
 					<span class="corner tr"></span>
 					<span class="corner bl"></span>
 					<span class="corner br"></span>
-				<!-- number zone: bottom-left corner of the card -->
+				<!-- number zone: LEFT vertical strip (number is rotated on left edge) -->
 				<div class="num-zone">
 					<div class="num-box">
 						<div class="scan-line"></div>
@@ -123,7 +123,7 @@
 			</div>
 			<!-- bottom dark band -->
 			<div class="band bottom">
-				<p class="hint">כוון את הכרטיס כך שימלא את המסגרת<br>המספר (פינה שמאל-תחתית) יוצג בתיבה הירוקה</p>
+				<p class="hint">כוון את הכרטיס כך שימלא את המסגרת הלבנה<br>המספר המודפס בצד שמאל יוצג בתיבה הירוקה</p>
 			</div>
 		</div>
 
@@ -222,28 +222,29 @@
 	.corner.bl { bottom: -2px; left: -2px;    border-bottom-width: 3px; border-left-width: 3px;  border-bottom-left-radius: 10px; }
 	.corner.br { bottom: -2px; right: -2px;   border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 10px; }
 
-	/* ── number zone: bottom-LEFT corner of the card ── */
+	/* ── number zone: left vertical strip ── */
 	.num-zone {
 		position: absolute;
+		top: 10px;
 		bottom: 10px;
-		left: 10px;   /* bottom-left to match the real card */
+		left: 10px;   /* left edge — that's where the rotated number is */
 		display: flex;
 		flex-direction: column;
-		align-items: flex-start;
-		gap: 4px;
+		align-items: center;
+		gap: 5px;
 	}
 
 	.num-box {
-		width: 120px;
-		height: 28px;
-		border: 2px solid rgba(74,222,128,0.95);  /* green to stand out */
+		width: 30px;       /* narrow vertical strip */
+		flex: 1;
+		border: 2px solid rgba(74,222,128,0.95);
 		border-radius: 4px;
 		background: rgba(74,222,128,0.08);
 		position: relative;
 		overflow: hidden;
 	}
 
-	/* animated scan line */
+	/* scan line sweeps top→bottom */
 	.scan-line {
 		position: absolute;
 		left: 0; right: 0;
@@ -259,11 +260,13 @@
 	}
 
 	.num-label {
-		font-size: 10px;
+		font-size: 9px;
 		color: rgba(74,222,128,0.95);
-		letter-spacing: 0.5px;
+		letter-spacing: 0.4px;
 		text-shadow: 0 1px 3px rgba(0,0,0,0.9);
 		white-space: nowrap;
+		writing-mode: vertical-rl;  /* label also vertical to match the number */
+		text-orientation: mixed;
 	}
 
 	/* hint text in bottom band */
