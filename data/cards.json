@@ -1,0 +1,17 @@
+[
+  {
+    "id": "965054247",
+    "holderName": "",
+    "lastFetched": "2026-05-15T14:41:31.433Z",
+    "data": {
+      "serial": "965054247",
+      "cardType": "סונול",
+      "totalUsedLiters": 311.28,
+      "usedLiters": 37.413,
+      "remainingLiters": 12.587,
+      "lastUsedDate": "14/05/2026",
+      "isActive": false,
+      "transactions": []
+    }
+  }
+]
