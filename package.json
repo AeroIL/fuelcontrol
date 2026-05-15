@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "@zxing/library": "^0.21.3",
-    "cheerio": "^1.0.0"
+    "cheerio": "^1.0.0",
+    "tesseract.js": "^7.0.0"
   },
   "type": "module"
 }
