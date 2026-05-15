@@ -89,96 +89,198 @@
 
 	{#if !cameraActive}
 		<div class="camera-placeholder">
-			<div class="camera-icon">📷</div>
-			<p>לחץ להפעלת המצלמה לסריקת ברקוד</p>
+			<div class="camera-icon">�</div>
+			<p class="ph-title">סרוק כרטיס דלק</p>
+			<p class="ph-sub">כוון את מספר הכרטיס מול המצלמה</p>
 			<button class="btn-primary" on:click={startCamera}>הפעל מצלמה</button>
 			{#if cameraError}
 				<p class="error-text">{cameraError}</p>
 			{/if}
 		</div>
 	{:else}
-		<div class="scan-overlay">
-			<div class="scan-frame"></div>
-			<p class="scan-hint">כוון את הברקוד של הכרטיס אל תוך המסגרת</p>
+		<!-- dark overlay with a card-shaped cutout in the centre -->
+		<div class="overlay" aria-hidden="true">
+			<!-- top dark band -->
+			<div class="band top"></div>
+			<!-- middle row: side bands + transparent card window -->
+			<div class="middle-row">
+				<div class="band side"></div>
+				<div class="card-window">
+					<!-- card outline corners -->
+					<span class="corner tl"></span>
+					<span class="corner tr"></span>
+					<span class="corner bl"></span>
+					<span class="corner br"></span>
+					<!-- barcode zone label -->
+					<div class="barcode-zone">
+						<div class="barcode-box">
+							<!-- animated scan line -->
+							<div class="scan-line"></div>
+						</div>
+						<p class="barcode-label">מספר כרטיס / ברקוד</p>
+					</div>
+				</div>
+				<div class="band side"></div>
+			</div>
+			<!-- bottom dark band -->
+			<div class="band bottom">
+				<p class="hint">כוון את הכרטיס כך שימלא את המסגרת הלבנה</p>
+			</div>
 		</div>
+
 		<div class="camera-controls">
 			<button class="btn-icon" on:click={flipCamera} title="הפוך מצלמה">🔄</button>
-			<button class="btn-secondary" on:click={stopCamera}>סגור מצלמה</button>
+			<button class="btn-secondary" on:click={stopCamera}>סגור</button>
 		</div>
 	{/if}
 </div>
 
 <style>
+	/* ── wrapper ── */
 	.scanner-wrapper {
 		width: 100%;
-		border-radius: var(--radius);
+		border-radius: var(--radius, 14px);
 		overflow: hidden;
-		background: #111;
+		background: #000;
 		position: relative;
 	}
 
+	/* ── live video ── */
 	.video-feed {
 		width: 100%;
 		display: block;
-		max-height: 320px;
+		height: 380px;
 		object-fit: cover;
 	}
+	.video-feed.hidden { display: none; }
 
-	.video-feed.hidden {
-		display: none;
-	}
-
+	/* ── idle placeholder ── */
 	.camera-placeholder {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 12px;
-		padding: 32px 16px;
-		background: #1a1a2e;
+		gap: 10px;
+		padding: 36px 20px;
+		background: #0f172a;
 		color: #fff;
-		min-height: 200px;
+		min-height: 220px;
 	}
+	.camera-icon { font-size: 52px; }
+	.ph-title { font-size: 16px; font-weight: 700; color: #f1f5f9; }
+	.ph-sub   { font-size: 13px; color: #94a3b8; text-align: center; }
 
-	.camera-icon {
-		font-size: 48px;
-	}
-
-	.camera-placeholder p {
-		color: #a0aec0;
-		font-size: 14px;
-		text-align: center;
-	}
-
-	.scan-overlay {
+	/* ── full-screen overlay (sits over the video) ── */
+	.overlay {
 		position: absolute;
 		inset: 0;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		justify-content: center;
 		pointer-events: none;
 	}
 
-	.scan-frame {
-		width: 200px;
-		height: 80px;
-		border: 2px solid rgba(255, 255, 255, 0.8);
-		border-radius: 6px;
-		box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+	/* dark bands that surround the card window */
+	.band { background: rgba(0,0,0,0.55); }
+	.band.top    { flex: 1; }
+	.band.bottom {
+		flex: 1;
+		display: flex;
+		align-items: flex-start;
+		justify-content: center;
+		padding-top: 10px;
+	}
+	.band.side   { flex: 1; }
+
+	.middle-row {
+		display: flex;
+		/* card aspect ratio 85.6 × 54 mm  ≈  1.585:1  →  use 80 % width */
+		height: calc(80vw / 1.585);
+		max-height: 190px;
 	}
 
-	.scan-hint {
-		color: rgba(255, 255, 255, 0.85);
+	/* ── transparent card window ── */
+	.card-window {
+		/* width is whatever is left between the two side bands */
+		flex: 5;
+		position: relative;
+		border: 2px solid rgba(255,255,255,0.9);
+		border-radius: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	/* corner accents */
+	.corner {
+		position: absolute;
+		width: 18px; height: 18px;
+		border-color: #fff;
+		border-style: solid;
+		border-width: 0;
+	}
+	.corner.tl { top: -2px;    left: -2px;    border-top-width: 3px; border-left-width: 3px;  border-top-left-radius: 10px; }
+	.corner.tr { top: -2px;    right: -2px;   border-top-width: 3px; border-right-width: 3px; border-top-right-radius: 10px; }
+	.corner.bl { bottom: -2px; left: -2px;    border-bottom-width: 3px; border-left-width: 3px;  border-bottom-left-radius: 10px; }
+	.corner.br { bottom: -2px; right: -2px;   border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 10px; }
+
+	/* ── barcode zone (bottom-third of the card) ── */
+	.barcode-zone {
+		position: absolute;
+		bottom: 12px;
+		left: 10px;
+		right: 10px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.barcode-box {
+		width: 100%;
+		height: 32px;
+		border: 1.5px solid rgba(99,179,237,0.9);
+		border-radius: 4px;
+		background: rgba(66,153,225,0.08);
+		position: relative;
+		overflow: hidden;
+	}
+
+	/* animated scan line */
+	.scan-line {
+		position: absolute;
+		left: 0; right: 0;
+		height: 2px;
+		background: rgba(99,179,237,0.9);
+		animation: sweep 1.8s ease-in-out infinite;
+		box-shadow: 0 0 6px rgba(99,179,237,0.8);
+	}
+	@keyframes sweep {
+		0%   { top: 0; }
+		50%  { top: calc(100% - 2px); }
+		100% { top: 0; }
+	}
+
+	.barcode-label {
+		font-size: 10px;
+		color: rgba(99,179,237,0.95);
+		letter-spacing: 0.5px;
+		text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+		white-space: nowrap;
+	}
+
+	/* hint text in bottom band */
+	.hint {
 		font-size: 12px;
-		margin-top: 8px;
+		color: rgba(255,255,255,0.75);
 		text-align: center;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+		text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+		padding: 0 12px;
 	}
 
+	/* ── controls ── */
 	.camera-controls {
 		position: absolute;
-		bottom: 10px;
+		top: 10px;
 		left: 10px;
 		display: flex;
 		gap: 8px;
@@ -186,36 +288,31 @@
 	}
 
 	.btn-primary {
-		background: var(--primary);
+		background: var(--primary, #1d4ed8);
 		color: #fff;
-		padding: 10px 24px;
+		padding: 10px 28px;
 		border-radius: 8px;
 		font-size: 15px;
-		transition: background 0.2s;
+		font-weight: 600;
+		transition: opacity 0.2s;
 	}
-
-	.btn-primary:hover {
-		background: var(--primary-dark);
-	}
+	.btn-primary:hover { opacity: 0.88; }
 
 	.btn-secondary {
-		background: rgba(255, 255, 255, 0.15);
+		background: rgba(255,255,255,0.15);
 		color: #fff;
 		padding: 6px 14px;
 		border-radius: 6px;
 		font-size: 13px;
+		font-weight: 600;
 		backdrop-filter: blur(4px);
 	}
-
-	.btn-secondary:hover {
-		background: rgba(255, 255, 255, 0.25);
-	}
+	.btn-secondary:hover { background: rgba(255,255,255,0.28); }
 
 	.btn-icon {
-		background: rgba(255, 255, 255, 0.15);
+		background: rgba(255,255,255,0.15);
 		color: #fff;
-		width: 36px;
-		height: 36px;
+		width: 36px; height: 36px;
 		border-radius: 50%;
 		font-size: 18px;
 		display: flex;
@@ -228,5 +325,6 @@
 		color: #fc8181;
 		font-size: 13px;
 		text-align: center;
+		max-width: 260px;
 	}
 </style>
