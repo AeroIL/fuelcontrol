@@ -1,7 +1,6 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
-	import CameraScanner from '$lib/components/CameraScanner.svelte';
 	import CardItem from '$lib/components/CardItem.svelte';
 	import type { SavedCard } from '$lib/types';
 	import type { PageData } from './$types';
@@ -12,11 +11,10 @@
 
 	let cards: SavedCard[] = [];
 	let refreshingIds = new Set<string>();
-	let searchInput = '';
-	let searching = false;
-	let searchError = '';
-	let showScanner = false;
-	let scanFlash = false;
+	let addInput = '';
+	let adding = false;
+	let addError = '';
+	let cardSearch = '';
 	let toast = '';
 	let toastTimer: ReturnType<typeof setTimeout>;
 
@@ -35,12 +33,22 @@
 		const name = (c.data?.cardName ?? '').toLowerCase();
 		if (fuelFilter === 'diesel' && !/סולר|diesel/i.test(name)) return false;
 		if (fuelFilter === 'gasoline' && !/בנזין|gasoline|95/i.test(name)) return false;
-		const rem = c.data?.remainingLiters ?? 0;
+		const rem = Number(c.data?.remainingLiters ?? 0);
 		if (fillFilter === 'full' && rem <= 50) return false;
 		if (fillFilter === 'partial' && (rem < 1 || rem >= 50)) return false;
 		if (fillFilter === 'empty' && rem >= 1) return false;
 		return true;
 	});
+
+	$: displayedCards = (() => {
+		const q = cardSearch.trim().toLowerCase();
+		if (!q) return filteredCards;
+		return filteredCards.filter((c) =>
+			c.id.includes(q) ||
+			(c.holderName ?? '').toLowerCase().includes(q) ||
+			(c.data?.cardName ?? '').toLowerCase().includes(q)
+		);
+	})();
 
 	onMount(async () => {
 		await loadCards();
@@ -91,18 +99,18 @@
 		for (const c of cards) refreshCard(c.id);
 	}
 
-	async function searchCard() {
-		const id = searchInput.trim().replace(/\D/g, '');
+	async function addCard() {
+		const id = addInput.trim().replace(/\D/g, '');
 		if (!id || id.length < 5) {
-			searchError = 'נא להזין מספר כרטיס תקין (לפחות 5 ספרות)';
+			addError = 'נא להזין מספר כרטיס תקין (לפחות 5 ספרות)';
 			return;
 		}
-		searching = true;
-		searchError = '';
+		adding = true;
+		addError = '';
 		try {
 			const fuelRes = await fetch(`/api/fuel/${encodeURIComponent(id)}`);
 			if (!fuelRes.ok) {
-				searchError = (await fuelRes.text()) || `שגיאה ${fuelRes.status}`;
+				addError = (await fuelRes.text()) || `שגיאה ${fuelRes.status}`;
 				return;
 			}
 			const fuelData = await fuelRes.json();
@@ -122,14 +130,13 @@
 
 			if (saveRes.ok) {
 				cards = await saveRes.json();
-				searchInput = '';
-				showScanner = false;
+				addInput = '';
 				showToast(cards.some((c) => c.id === id && c.holderName === '') ? 'כרטיס נוסף ✓' : 'כרטיס עודכן ✓');
 			}
 		} catch {
-			searchError = 'שגיאת רשת — ודא חיבור לאינטרנט';
+			addError = 'שגיאת רשת — ודא חיבור לאינטרנט';
 		} finally {
-			searching = false;
+			adding = false;
 		}
 	}
 
@@ -151,15 +158,8 @@
 		}
 	}
 
-	function handleScan(e: CustomEvent<string>) {
-		searchInput = e.detail;
-		scanFlash = true;
-		setTimeout(() => (scanFlash = false), 1400);
-		searchCard();
-	}
-
 	function onKeydown(e: KeyboardEvent) {
-		if (e.key === 'Enter') searchCard();
+		if (e.key === 'Enter') addCard();
 	}
 
 	function showToast(msg: string) {
@@ -231,47 +231,31 @@
 	</header>
 
 	<main>
-		<!-- ══ Search panel ══ -->
-		<div class="search-panel">
-			<div class="search-row">
-				<button
-					class="btn-scan-toggle"
-					class:active={showScanner}
-					on:click={() => (showScanner = !showScanner)}
-					title="סרוק ברקוד"
-				>
-					<span>📷</span>
-				</button>
-
+		<!-- ══ Add card panel ══ -->
+		<div class="add-panel">
+			<p class="add-label">הוסף כרטיס</p>
+			<div class="add-row">
 				<input
 					type="text"
 					inputmode="numeric"
-					placeholder="מספר כרטיס…"
-					bind:value={searchInput}
+					placeholder="מספר כרטיס..."
+					bind:value={addInput}
 					on:keydown={onKeydown}
-					class:flash={scanFlash}
 					maxlength="15"
-					disabled={searching}
+					disabled={adding}
+					dir="ltr"
 					aria-label="מספר כרטיס"
 				/>
-
-				<button class="btn-add" on:click={searchCard} disabled={searching}>
-					{#if searching}
+				<button class="btn-add" on:click={addCard} disabled={adding}>
+					{#if adding}
 						<span class="spinner"></span>
 					{:else}
 						הוסף
 					{/if}
 				</button>
 			</div>
-
-			{#if searchError}
-				<div class="search-error" role="alert">{searchError}</div>
-			{/if}
-
-			{#if showScanner}
-				<div class="scanner-wrap">
-					<CameraScanner on:scan={handleScan} />
-				</div>
+			{#if addError}
+				<div class="add-error" role="alert">{addError}</div>
 			{/if}
 		</div>
 
@@ -280,7 +264,7 @@
 			<div class="empty-state">
 				<div class="empty-icon">⛽</div>
 				<h2>אין כרטיסים שמורים</h2>
-				<p>סרוק ברקוד כרטיס או הכנס מספר כרטיס כדי להתחיל</p>
+				<p>הכנס מספר כרטיס כדי להתחיל</p>
 			</div>
 		{:else}
 			<!-- Filter bar -->
@@ -302,15 +286,32 @@
 				<span class="filter-count">{filteredCards.length} / {cards.length}</span>
 			</div>
 
-			{#if filteredCards.length === 0}
+			<!-- Card search -->
+			<div class="card-search-wrap">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" class="search-icon" aria-hidden="true">
+					<circle cx="11" cy="11" r="8"/>
+					<path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+				</svg>
+				<input
+					type="text"
+					placeholder="חיפוש לפי שם או מספר כרטיס..."
+					bind:value={cardSearch}
+					class="card-search-input"
+				/>
+				{#if cardSearch}
+					<button class="search-clear" on:click={() => (cardSearch = '')} aria-label="נקה חיפוש">×</button>
+				{/if}
+			</div>
+
+			{#if displayedCards.length === 0}
 				<div class="empty-state">
 					<div class="empty-icon">🔍</div>
 					<h2>אין כרטיסים תואמים</h2>
-					<p>שנה את הפילטרים כדי לראות כרטיסים</p>
+					<p>שנה את הפילטרים או מחרוזת החיפוש כדי לראות כרטיסים</p>
 				</div>
 			{:else}
 				<div class="cards-grid">
-					{#each filteredCards as card (card.id)}
+					{#each displayedCards as card (card.id)}
 						<CardItem
 							{card}
 							refreshing={refreshingIds.has(card.id)}
@@ -449,42 +450,29 @@
 		gap: 20px;
 	}
 
-	/* ── Search panel ── */
-	.search-panel {
+	/* ── Add card panel ── */
+	.add-panel {
 		background: #fff;
-		border-radius: 16px;
+		border-radius: 14px;
 		padding: 14px 16px;
 		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07), 0 4px 12px rgba(0, 0, 0, 0.04);
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
 	}
-
-	.search-row {
+	.add-label {
+		font-size: 11px;
+		font-weight: 700;
+		color: #94a3b8;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+	.add-row {
 		display: flex;
 		gap: 10px;
 		align-items: center;
 	}
-
-	.btn-scan-toggle {
-		width: 44px;
-		height: 44px;
-		border-radius: 12px;
-		background: #f1f5f9;
-		font-size: 20px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: background 0.15s;
-		flex-shrink: 0;
-	}
-
-	.btn-scan-toggle:hover,
-	.btn-scan-toggle.active {
-		background: #dbeafe;
-	}
-
-	.search-row input {
+	.add-row input {
 		flex: 1;
 		height: 44px;
 		padding: 0 14px;
@@ -492,31 +480,28 @@
 		border-radius: 12px;
 		font-size: 16px;
 		font-family: 'Courier New', monospace;
-		text-align: center;
+		text-align: left;
 		direction: ltr;
 		outline: none;
-		transition:
-			border-color 0.2s,
-			box-shadow 0.2s,
-			background 0.25s;
-		background: #fff;
+		transition: border-color 0.2s, box-shadow 0.2s;
+		background: #f8fafc;
 		color: #0f172a;
+		width: 100%;
 	}
-
-	.search-row input:focus {
+	.add-row input:focus {
 		border-color: #3b82f6;
 		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+		background: #fff;
 	}
-
-	.search-row input.flash {
-		background: #f0fdf4;
-		border-color: #22c55e;
+	.add-row input:disabled { opacity: 0.6; }
+	.add-error {
+		background: #fef2f2;
+		color: #b91c1c;
+		border: 1px solid #fecaca;
+		border-radius: 8px;
+		padding: 8px 12px;
+		font-size: 13px;
 	}
-
-	.search-row input:disabled {
-		opacity: 0.6;
-	}
-
 	.btn-add {
 		height: 44px;
 		padding: 0 20px;
@@ -543,21 +528,52 @@
 		cursor: not-allowed;
 	}
 
-	.search-error {
-		background: #fef2f2;
-		color: #b91c1c;
-		border: 1px solid #fecaca;
-		border-radius: 8px;
-		padding: 8px 12px;
-		font-size: 13px;
+	/* ── Card search ── */
+	.card-search-wrap {
+		position: relative;
+		display: flex;
+		align-items: center;
 	}
-
-	.scanner-wrap {
-		border-radius: 10px;
-		overflow: hidden;
+	.search-icon {
+		position: absolute;
+		right: 12px;
+		color: #94a3b8;
+		pointer-events: none;
+		flex-shrink: 0;
 	}
+	.card-search-input {
+		width: 100%;
+		height: 40px;
+		padding: 0 40px 0 36px;
+		border: 1.5px solid #e2e8f0;
+		border-radius: 12px;
+		font-size: 14px;
+		outline: none;
+		background: #fff;
+		color: #0f172a;
+		transition: border-color 0.2s, box-shadow 0.2s;
+	}
+	.card-search-input:focus {
+		border-color: #3b82f6;
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+	}
+	.card-search-input::placeholder { color: #94a3b8; }
+	.search-clear {
+		position: absolute;
+		left: 10px;
+		background: none;
+		border: none;
+		font-size: 18px;
+		color: #94a3b8;
+		cursor: pointer;
+		line-height: 1;
+		padding: 0 4px;
+	}
+	.search-clear:hover { color: #475569; }
 
-	/* Spinner */
+	/* ── Btn add ── */
+
+	/* ── Spinner ── */
 	.spinner {
 		width: 16px;
 		height: 16px;

@@ -57,6 +57,7 @@
 						autocomplete="tel"
 						dir="ltr"
 						maxlength="15"
+						class="phone-input"
 					/>
 				</div>
 
@@ -73,7 +74,7 @@
 				</button>
 			</form>
 		{:else}
-			<p class="sent-note">קוד נשלח ל‑<strong dir="ltr">{phone}</strong></p>
+			<div class="sent-note">קוד נשלח ל‑<strong dir="ltr">{phone}</strong></div>
 
 			<form
 				method="POST"
@@ -95,7 +96,7 @@
 						name="otp"
 						type="text"
 						inputmode="numeric"
-						placeholder="——————"
+						placeholder="000000"
 						maxlength="6"
 						required
 						autocomplete="one-time-code"
@@ -198,11 +199,29 @@
 		background: #fff;
 	}
 
+	.phone-input {
+		text-align: left;
+		letter-spacing: 0.05em;
+		font-family: 'Courier New', monospace;
+		font-size: 18px;
+	}
+
 	.otp-input {
-		letter-spacing: 0.5em;
-		font-size: 24px;
+		letter-spacing: 0.6em;
+		font-size: 26px;
 		text-align: center;
 		font-weight: 700;
+		padding: 0 10px;
+	}
+
+	.sent-note {
+		text-align: center;
+		font-size: 13px;
+		color: #475569;
+		background: #f0fdf4;
+		border: 1px solid #bbf7d0;
+		border-radius: 8px;
+		padding: 9px 14px;
 	}
 
 	.btn-primary {
@@ -240,16 +259,6 @@
 		border-radius: 8px;
 		padding: 8px 12px;
 		font-size: 13px;
-	}
-
-	.sent-note {
-		font-size: 13px;
-		color: #475569;
-		text-align: center;
-		background: #f0fdf4;
-		border: 1px solid #bbf7d0;
-		border-radius: 8px;
-		padding: 8px 12px;
 	}
 
 	.spinner {
