@@ -313,9 +313,9 @@
 
 	/* ── App header ── */
 	.app-header {
-		background: linear-gradient(135deg, #0d47a1 0%, #1565c0 60%, #1e88e5 100%);
+		background: #0f172a;
 		color: #fff;
-		box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+		box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06), 0 2px 12px rgba(0, 0, 0, 0.3);
 		position: sticky;
 		top: 0;
 		z-index: 50;
@@ -357,14 +357,14 @@
 		display: flex;
 		align-items: center;
 		gap: 6px;
-		background: rgba(255, 255, 255, 0.15);
-		color: #fff;
-		border-radius: 10px;
-		padding: 8px 14px;
+		background: rgba(255, 255, 255, 0.1);
+		color: rgba(255, 255, 255, 0.9);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 8px;
+		padding: 7px 13px;
 		font-size: 13px;
 		font-weight: 500;
 		transition: background 0.15s;
-		backdrop-filter: blur(4px);
 	}
 
 	.btn-refresh-all:hover:not(:disabled) {
@@ -437,9 +437,9 @@
 		flex: 1;
 		height: 44px;
 		padding: 0 14px;
-		border: 2px solid #e2e8f0;
+		border: 1.5px solid #e2e8f0;
 		border-radius: 12px;
-		font-size: 18px;
+		font-size: 16px;
 		font-family: 'Courier New', monospace;
 		text-align: center;
 		direction: ltr;
@@ -468,8 +468,8 @@
 
 	.btn-add {
 		height: 44px;
-		padding: 0 22px;
-		background: #1d4ed8;
+		padding: 0 20px;
+		background: #2563eb;
 		color: #fff;
 		border-radius: 12px;
 		font-size: 15px;
@@ -478,13 +478,13 @@
 		align-items: center;
 		justify-content: center;
 		gap: 6px;
-		min-width: 88px;
+		min-width: 80px;
 		transition: background 0.15s;
 		flex-shrink: 0;
 	}
 
 	.btn-add:hover:not(:disabled) {
-		background: #1e40af;
+		background: #1d4ed8;
 	}
 
 	.btn-add:disabled {
@@ -593,8 +593,8 @@
 	/* ── Cards grid ── */
 	.cards-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: 16px;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 14px;
 	}
 
 	/* ── Empty state ── */
@@ -658,19 +658,63 @@
 		}
 	}
 
-	/* ── Mobile tweaks ── */
+	/* ── Responsive ── */
+	@media (max-width: 640px) {
+		/* Filter bar scrolls horizontally on small screens */
+		.filter-bar {
+			overflow-x: auto;
+			flex-wrap: nowrap;
+			scrollbar-width: none;
+			-webkit-overflow-scrolling: touch;
+			padding: 8px 12px;
+		}
+		.filter-bar::-webkit-scrollbar {
+			display: none;
+		}
+		.filter-sep {
+			display: none;
+		}
+		.filter-count {
+			display: none;
+		}
+	}
+
 	@media (max-width: 480px) {
+		.header-inner {
+			padding: 11px 14px;
+		}
 		.logo h1 {
-			font-size: 17px;
+			font-size: 16px;
 		}
 		.logo-emoji {
 			font-size: 26px;
 		}
-		.cards-grid {
-			grid-template-columns: 1fr;
+		.logo-sub {
+			display: none;
+		}
+		.btn-refresh-all span {
+			display: none;
+		}
+		.btn-refresh-all {
+			padding: 8px;
+			min-width: 36px;
+			justify-content: center;
 		}
 		main {
-			padding: 14px 12px 40px;
+			padding: 12px 10px calc(env(safe-area-inset-bottom, 0px) + 56px);
+			gap: 12px;
+		}
+		.search-panel {
+			padding: 12px;
+		}
+		.cards-grid {
+			grid-template-columns: 1fr;
+			gap: 10px;
+		}
+		.toast {
+			bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+			font-size: 13px;
+			padding: 9px 18px;
 		}
 	}
 </style>

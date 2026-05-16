@@ -235,15 +235,14 @@
 	.card {
 		background: #fff;
 		border-radius: 14px;
-		border: 1px solid #e2e8f0;
+		border: 1px solid #e8edf3;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
-		transition: box-shadow 0.18s, transform 0.18s;
+		transition: box-shadow 0.18s;
 	}
 	.card:hover {
-		box-shadow: 0 6px 20px rgba(0,0,0,.09);
-		transform: translateY(-1px);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 	}
 	.card.refreshing { opacity: 0.6; pointer-events: none; }
 
@@ -256,7 +255,6 @@
 		gap: 8px;
 		border-bottom: 1px solid #f1f5f9;
 	}
-	.name-area { flex: 1; min-width: 0; }
 	.name-btn {
 		display: inline-flex;
 		align-items: center;
@@ -276,7 +274,7 @@
 	.name-input {
 		border: 1.5px solid #93c5fd;
 		border-radius: 6px;
-		font-size: 14px;
+		font-size: 16px;
 		padding: 4px 8px;
 		width: 100%;
 		outline: none;
@@ -393,7 +391,16 @@
 	.chevron { font-size: 16px; transition: transform 0.2s; display: inline-block; }
 	.chevron.open { transform: rotate(180deg); }
 
-	.tx-table-wrap { overflow-x: auto; border-top: 1px solid #f1f5f9; }
+	.tx-table-wrap {
+		overflow-x: auto;
+		border-top: 1px solid #f1f5f9;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: thin;
+		scrollbar-color: #e2e8f0 transparent;
+	}
+	.tx-table-wrap::-webkit-scrollbar { height: 4px; }
+	.tx-table-wrap::-webkit-scrollbar-track { background: transparent; }
+	.tx-table-wrap::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
 	.tx-table {
 		width: 100%; border-collapse: collapse;
 		font-size: 12px; text-align: right;
@@ -421,5 +428,22 @@
 		padding: 8px 14px;
 	}
 	.updated { font-size: 11px; color: #cbd5e1; }
+
+	/* ── Mobile responsive ── */
+	@media (max-width: 480px) {
+		.card-top { padding: 10px 12px 8px; }
+		.id-strip { padding: 6px 12px; }
+		.fuel-section { padding: 12px 12px 8px; }
+		.fuel-val { font-size: 20px; }
+		.last-section { padding: 10px 12px; }
+		.tx-toggle { padding: 9px 12px; font-size: 12px; }
+		.tx-table th, .tx-table td { padding: 6px 8px; }
+		/* Hide חברה and סוג columns on mobile to fit the table */
+		.tx-table th:nth-child(4),
+		.tx-table td:nth-child(4),
+		.tx-table th:nth-child(5),
+		.tx-table td:nth-child(5) { display: none; }
+		.card-footer { padding: 7px 12px; }
+	}
 </style>
 

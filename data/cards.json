@@ -1,8 +1,409 @@
 [
   {
+    "id": "949335243",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:31:41.740Z",
+    "data": {
+      "serial": "949335243",
+      "cardName": "סולר 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 280.12,
+      "usedLiters": 22.83,
+      "remainingLiters": 27.17,
+      "lastUsedDate": "15/05/2026",
+      "isActive": false,
+      "transactions": [
+        {
+          "vehicleNumber": "66998503",
+          "fuelType": "סונול",
+          "transactionType": "כרטיס",
+          "date": "5/15/2026",
+          "time": "19:20:00",
+          "stationName": "סונול כאוכב",
+          "branchNumber": "2102",
+          "serialNumber": "949335243",
+          "litersOrCost": 0
+        },
+        {
+          "vehicleNumber": "66998503",
+          "fuelType": "סונול",
+          "transactionType": "כרטיס",
+          "date": "5/15/2026",
+          "time": "19:22:00",
+          "stationName": "סונול כאוכב",
+          "branchNumber": "2102",
+          "serialNumber": "949335243",
+          "litersOrCost": 22.83
+        }
+      ]
+    }
+  },
+  {
+    "id": "949334247",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:31:41.723Z",
+    "data": {
+      "serial": "949334247",
+      "cardName": "סולר 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 557,
+      "usedLiters": 50,
+      "remainingLiters": 0,
+      "lastUsedDate": "15/05/2026",
+      "isActive": false,
+      "transactions": [
+        {
+          "vehicleNumber": "66998503",
+          "fuelType": "דלק",
+          "transactionType": "כרטיס",
+          "date": "5/15/2026",
+          "time": "14:42:00",
+          "stationName": "חורפיש",
+          "branchNumber": "234",
+          "serialNumber": "949334247",
+          "litersOrCost": 50
+        }
+      ]
+    }
+  },
+  {
+    "id": "949970243",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:31:41.713Z",
+    "data": {
+      "serial": "949970243",
+      "cardName": "סולר 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 557,
+      "usedLiters": 50,
+      "remainingLiters": 0,
+      "lastUsedDate": "14/05/2026",
+      "isActive": false,
+      "transactions": [
+        {
+          "vehicleNumber": "66998503",
+          "fuelType": "דלק",
+          "transactionType": "כרטיס",
+          "date": "5/14/2026",
+          "time": "14:08:00",
+          "stationName": "דלק איילון",
+          "branchNumber": "210",
+          "serialNumber": "949970243",
+          "litersOrCost": 50
+        }
+      ]
+    }
+  },
+  {
+    "id": "949971243",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:31:41.631Z",
+    "data": {
+      "serial": "949971243",
+      "cardName": "סולר 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 557,
+      "usedLiters": 49.999,
+      "remainingLiters": 0.001,
+      "lastUsedDate": "14/05/2026",
+      "isActive": false,
+      "transactions": [
+        {
+          "vehicleNumber": "61202204",
+          "fuelType": "דלק",
+          "transactionType": "כרטיס",
+          "date": "5/14/2026",
+          "time": "14:16:00",
+          "stationName": "דלק מחניים",
+          "branchNumber": "352",
+          "serialNumber": "949971243",
+          "litersOrCost": 25.005
+        },
+        {
+          "vehicleNumber": "61202204",
+          "fuelType": "דלק",
+          "transactionType": "כרטיס",
+          "date": "5/14/2026",
+          "time": "15:27:00",
+          "stationName": "דלק מחניים",
+          "branchNumber": "352",
+          "serialNumber": "949971243",
+          "litersOrCost": 24.994
+        }
+      ]
+    }
+  },
+  {
+    "id": "949336244",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:31:41.409Z",
+    "data": {
+      "serial": "949336244",
+      "cardName": "סולר 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 557,
+      "usedLiters": 50,
+      "remainingLiters": 0,
+      "lastUsedDate": "15/05/2026",
+      "isActive": false,
+      "transactions": [
+        {
+          "vehicleNumber": "61202204",
+          "fuelType": "דלק",
+          "transactionType": "כרטיס",
+          "date": "5/15/2026",
+          "time": "23:12:00",
+          "stationName": "דלק כפר",
+          "branchNumber": "58",
+          "serialNumber": "949336244",
+          "litersOrCost": 50
+        }
+      ]
+    }
+  },
+  {
+    "id": "1074758246",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:31:41.495Z",
+    "data": {
+      "serial": "1074758246",
+      "cardName": "בנזין 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 410.99,
+      "usedLiters": 49.398,
+      "remainingLiters": 0.602,
+      "lastUsedDate": "12/05/2026",
+      "isActive": false,
+      "transactions": [
+        {
+          "vehicleNumber": "67718603",
+          "fuelType": "סונול",
+          "transactionType": "כרטיס",
+          "date": "5/12/2026",
+          "time": "10:41:00",
+          "stationName": "סונול כאוכב",
+          "branchNumber": "2102",
+          "serialNumber": "1074758246",
+          "litersOrCost": 19.439
+        },
+        {
+          "vehicleNumber": "67718603",
+          "fuelType": "דלק",
+          "transactionType": "כרטיס",
+          "date": "5/11/2026",
+          "time": "10:10:00",
+          "stationName": "דלק כרמיאל",
+          "branchNumber": "325",
+          "serialNumber": "1074758246",
+          "litersOrCost": 29.959
+        }
+      ]
+    }
+  },
+  {
+    "id": "304474253",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:31:46.244Z",
+    "data": {
+      "serial": "304474253",
+      "cardName": "בנזין 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 414.43,
+      "usedLiters": 49.811,
+      "remainingLiters": 0.189,
+      "lastUsedDate": "12/05/2026",
+      "isActive": false,
+      "transactions": [
+        {
+          "vehicleNumber": "67718603",
+          "fuelType": "סונול",
+          "transactionType": "כרטיס",
+          "date": "5/12/2026",
+          "time": "10:39:00",
+          "stationName": "סונול כאוכב",
+          "branchNumber": "2102",
+          "serialNumber": "304474253",
+          "litersOrCost": 6.079
+        },
+        {
+          "vehicleNumber": "67718603",
+          "fuelType": "דלק",
+          "transactionType": "כרטיס",
+          "date": "5/8/2026",
+          "time": "23:46:00",
+          "stationName": "דלק מירון",
+          "branchNumber": "45",
+          "serialNumber": "304474253",
+          "litersOrCost": 30.752
+        },
+        {
+          "vehicleNumber": "67718603",
+          "fuelType": "סונול",
+          "transactionType": "כרטיס",
+          "date": "5/6/2026",
+          "time": "19:05:00",
+          "stationName": "צלמון",
+          "branchNumber": "2746",
+          "serialNumber": "304474253",
+          "litersOrCost": 12.98
+        }
+      ]
+    }
+  },
+  {
+    "id": "304468259",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:31:46.231Z",
+    "data": {
+      "serial": "304468259",
+      "cardName": "בנזין 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 382.4,
+      "usedLiters": 45.962,
+      "remainingLiters": 4.038,
+      "lastUsedDate": "13/05/2026",
+      "isActive": false,
+      "transactions": [
+        {
+          "vehicleNumber": "39295304",
+          "fuelType": "סונול",
+          "transactionType": "כרטיס",
+          "date": "5/13/2026",
+          "time": "06:51:00",
+          "stationName": "סונול רגבה",
+          "branchNumber": "2516",
+          "serialNumber": "304468259",
+          "litersOrCost": 0
+        },
+        {
+          "vehicleNumber": "39295304",
+          "fuelType": "סונול",
+          "transactionType": "כרטיס",
+          "date": "5/13/2026",
+          "time": "06:53:00",
+          "stationName": "סונול רגבה",
+          "branchNumber": "2516",
+          "serialNumber": "304468259",
+          "litersOrCost": 0
+        },
+        {
+          "vehicleNumber": "39295304",
+          "fuelType": "סונול",
+          "transactionType": "כרטיס",
+          "date": "5/13/2026",
+          "time": "07:32:00",
+          "stationName": "סונול נהריה",
+          "branchNumber": "2298",
+          "serialNumber": "304468259",
+          "litersOrCost": 17.712
+        },
+        {
+          "vehicleNumber": "84194103",
+          "fuelType": "דלק",
+          "transactionType": "כרטיס",
+          "date": "5/12/2026",
+          "time": "23:15:00",
+          "stationName": "דלק כפר",
+          "branchNumber": "58",
+          "serialNumber": "304468259",
+          "litersOrCost": 28.25
+        }
+      ]
+    }
+  },
+  {
+    "id": "304469250",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:31:46.276Z",
+    "data": {
+      "serial": "304469250",
+      "cardName": "בנזין 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 411.72,
+      "usedLiters": 49.485,
+      "remainingLiters": 0.515,
+      "lastUsedDate": "14/05/2026",
+      "isActive": false,
+      "transactions": [
+        {
+          "vehicleNumber": "11488203",
+          "fuelType": "סונול",
+          "transactionType": "כרטיס",
+          "date": "5/14/2026",
+          "time": "17:38:00",
+          "stationName": "סונול נהריה",
+          "branchNumber": "2298",
+          "serialNumber": "304469250",
+          "litersOrCost": 16.65
+        },
+        {
+          "vehicleNumber": "73782003",
+          "fuelType": "דלק",
+          "transactionType": "כרטיס",
+          "date": "5/13/2026",
+          "time": "09:52:00",
+          "stationName": "דלק שלומי",
+          "branchNumber": "233",
+          "serialNumber": "304469250",
+          "litersOrCost": 32.835
+        }
+      ]
+    }
+  },
+  {
+    "id": "965049243",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:31:46.635Z",
+    "data": {
+      "serial": "965049243",
+      "cardName": "בנזין 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 415.74,
+      "usedLiters": 49.969,
+      "remainingLiters": 0.031,
+      "lastUsedDate": "16/05/2026",
+      "isActive": false,
+      "transactions": [
+        {
+          "vehicleNumber": "79936403",
+          "fuelType": "דלק",
+          "transactionType": "כרטיס",
+          "date": "5/16/2026",
+          "time": "07:56:00",
+          "stationName": "דלק כפר",
+          "branchNumber": "58",
+          "serialNumber": "965049243",
+          "litersOrCost": 25.097
+        },
+        {
+          "vehicleNumber": "84194103",
+          "fuelType": "דלק",
+          "transactionType": "כרטיס",
+          "date": "5/14/2026",
+          "time": "13:25:00",
+          "stationName": "דלק כפר",
+          "branchNumber": "58",
+          "serialNumber": "965049243",
+          "litersOrCost": 23.772
+        },
+        {
+          "vehicleNumber": "67718603",
+          "fuelType": "סונול",
+          "transactionType": "כרטיס",
+          "date": "5/12/2026",
+          "time": "10:42:00",
+          "stationName": "סונול כאוכב",
+          "branchNumber": "2102",
+          "serialNumber": "965049243",
+          "litersOrCost": 1.1
+        }
+      ]
+    }
+  },
+  {
     "id": "107686258",
     "holderName": "",
-    "lastFetched": "2026-05-16T21:12:11.233Z",
+    "lastFetched": "2026-05-16T21:31:46.576Z",
     "data": {
       "serial": "107686258",
       "cardName": "בנזין 50 ליטר",
@@ -18,7 +419,7 @@
   {
     "id": "965055240",
     "holderName": "",
-    "lastFetched": "2026-05-16T21:12:11.201Z",
+    "lastFetched": "2026-05-16T21:31:46.648Z",
     "data": {
       "serial": "965055240",
       "cardName": "בנזין 50 ליטר",
@@ -34,7 +435,7 @@
   {
     "id": "107687252",
     "holderName": "",
-    "lastFetched": "2026-05-16T21:12:11.150Z",
+    "lastFetched": "2026-05-16T21:31:51.554Z",
     "data": {
       "serial": "107687252",
       "cardName": "בנזין 50 ליטר",
@@ -50,7 +451,7 @@
   {
     "id": "107688259",
     "holderName": "",
-    "lastFetched": "2026-05-16T21:12:11.248Z",
+    "lastFetched": "2026-05-16T21:31:51.362Z",
     "data": {
       "serial": "107688259",
       "cardName": "בנזין 50 ליטר",
@@ -66,7 +467,7 @@
   {
     "id": "107689251",
     "holderName": "",
-    "lastFetched": "2026-05-16T21:12:11.222Z",
+    "lastFetched": "2026-05-16T21:31:51.420Z",
     "data": {
       "serial": "107689251",
       "cardName": "בנזין 50 ליטר",
@@ -82,7 +483,7 @@
   {
     "id": "107685252",
     "holderName": "",
-    "lastFetched": "2026-05-16T21:12:11.176Z",
+    "lastFetched": "2026-05-16T21:31:51.615Z",
     "data": {
       "serial": "107685252",
       "cardName": "בנזין 50 ליטר",
@@ -110,7 +511,7 @@
   {
     "id": "949338249",
     "holderName": "",
-    "lastFetched": "2026-05-16T21:12:16.248Z",
+    "lastFetched": "2026-05-16T21:31:51.844Z",
     "data": {
       "serial": "949338249",
       "cardName": "סולר 50 ליטר",
@@ -126,7 +527,7 @@
   {
     "id": "949337242",
     "holderName": "",
-    "lastFetched": "2026-05-16T21:12:16.296Z",
+    "lastFetched": "2026-05-16T21:31:51.809Z",
     "data": {
       "serial": "949337242",
       "cardName": "סולר 50 ליטר",
@@ -154,7 +555,7 @@
   {
     "id": "949339246",
     "holderName": "",
-    "lastFetched": "2026-05-16T21:12:16.256Z",
+    "lastFetched": "2026-05-16T21:31:55.852Z",
     "data": {
       "serial": "949339246",
       "cardName": "סולר 50 ליטר",
@@ -170,7 +571,7 @@
   {
     "id": "965054247",
     "holderName": "",
-    "lastFetched": "2026-05-16T21:12:16.314Z",
+    "lastFetched": "2026-05-16T21:31:55.929Z",
     "data": {
       "serial": "965054247",
       "cardName": "בנזין 50 ליטר",
