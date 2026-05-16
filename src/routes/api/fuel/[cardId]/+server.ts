@@ -42,7 +42,7 @@ export const GET: RequestHandler = async ({ params }) => {
 	// Send a 1-year date range so we get full transaction history
 	const now = new Date();
 	const oneYearAgo = new Date(now);
-	oneYearAgo.setFullYear(now.getFullYear() - 1);
+	oneYearAgo.setDate(now.getDate() - 7);
 	const fmtDate = (d: Date) =>
 		`${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 
