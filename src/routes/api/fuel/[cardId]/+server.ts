@@ -39,10 +39,19 @@ export const GET: RequestHandler = async ({ params }) => {
 	const eventValidation = String($init('#__EVENTVALIDATION').val() ?? '');
 
 	// Step 2: POST the search form with card ID
+	// Send a 1-year date range so we get full transaction history
+	const now = new Date();
+	const oneYearAgo = new Date(now);
+	oneYearAgo.setFullYear(now.getFullYear() - 1);
+	const fmtDate = (d: Date) =>
+		`${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+
 	const formBody = new URLSearchParams({
 		__VIEWSTATE: viewState,
 		__VIEWSTATEGENERATOR: viewStateGenerator,
 		__EVENTVALIDATION: eventValidation,
+		'dpStart$dateInput': fmtDate(oneYearAgo),
+		'dpEnd$dateInput': fmtDate(now),
 		tbSearch: cardId,
 		btnSearch: 'חפש'
 	});
@@ -100,30 +109,24 @@ function parseHtml(html: string, cardId: string): FuelCard {
 
 		const vals = cells.toArray().map((c) => ct($, c as cheerio.Element));
 
-		// First short Hebrew-text cell → card type
-		for (const v of vals) {
-			if (/[\u0590-\u05FF]/.test(v) && !/(פעיל|לא פעיל)/.test(v) && v.length < 30) {
-				cardType = v;
-				break;
+		// Build a label→value map from consecutive cell pairs.
+		// Row layout: [label][value][label][value]...
+		// e.g. "סוג כרטיס:" → "קש דלק", "S/N:" → "949334247",
+		//      "סכום שהשתמשו:" → "557.0000" (money, not liters!),
+		//      "ליטרים שהשתמשו:" → "50.0000", "ליטרים שנותרו:" → "0.0000"
+		for (let i = 0; i < vals.length - 1; i++) {
+			const label = vals[i];
+			const value = vals[i + 1];
+			const num = parseFloat(value.replace(/,/g, ''));
+			if (/סוג כרטיס/.test(label)) {
+				cardType = value;
+			} else if (/ליטרים שהשתמשו/.test(label)) {
+				usedLiters = isNaN(num) ? 0 : num;
+			} else if (/ליטרים שנותרו/.test(label)) {
+				remainingLiters = isNaN(num) ? 0 : num;
+			} else if (/סכום שהשתמשו|כמות שהשתמשו/.test(label)) {
+				totalUsedLiters = isNaN(num) ? 0 : num;
 			}
-		}
-
-		// Cells that look like decimal liters (e.g. "37.4130", "311.2800")
-		const decimals = vals
-			.filter((v) => v !== cardId && /^\d+\.\d+$/.test(v.replace(/,/g, '')))
-			.map((v) => parseFloat(v.replace(/,/g, '')))
-			.filter((n) => !isNaN(n))
-			.sort((a, b) => b - a);
-
-		if (decimals.length >= 3) {
-			totalUsedLiters = decimals[0];
-			usedLiters = decimals[1];
-			remainingLiters = decimals[2];
-		} else if (decimals.length === 2) {
-			usedLiters = decimals[0];
-			remainingLiters = decimals[1];
-		} else if (decimals.length === 1) {
-			usedLiters = decimals[0];
 		}
 
 		isActive = vals.some((v) => v === 'פעיל');
@@ -181,7 +184,8 @@ function parseHtml(html: string, cardId: string): FuelCard {
 				return idx !== undefined ? ct($, cells[idx] as cheerio.Element) : '';
 			};
 
-			const dateVal = get('date');
+			// Date arrives as "5/14/2026 12:00:00 AM" — strip the time suffix
+			const dateVal = get('date').replace(/\s+\d+:\d+:\d+\s*(AM|PM)?$/i, '').trim();
 			const litersRaw = get('liters').replace(/,/g, '');
 			const liters = parseFloat(litersRaw) || 0;
 

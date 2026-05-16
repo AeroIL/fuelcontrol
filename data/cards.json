@@ -1,11 +1,26 @@
 [
   {
+    "id": "949339246",
+    "holderName": "",
+    "lastFetched": "2026-05-16T20:40:42.260Z",
+    "data": {
+      "serial": "949339246",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 0,
+      "usedLiters": 0,
+      "remainingLiters": 50,
+      "lastUsedDate": "21.1.330",
+      "isActive": false,
+      "transactions": []
+    }
+  },
+  {
     "id": "965054247",
     "holderName": "",
-    "lastFetched": "2026-05-15T15:51:22.432Z",
+    "lastFetched": "2026-05-16T20:40:43.218Z",
     "data": {
       "serial": "965054247",
-      "cardType": "סונול",
+      "cardType": "קש דלק",
       "totalUsedLiters": 311.28,
       "usedLiters": 37.413,
       "remainingLiters": 12.587,
