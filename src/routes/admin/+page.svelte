@@ -5,7 +5,8 @@
 	export let data: PageData;
 	export let form: ActionData;
 
-	$: numbers = (form as any)?.numbers ?? data.numbers;
+	$: af = form as { numbers?: string[]; error?: string } | null;
+	$: numbers = af?.numbers ?? data.numbers;
 	let adding = false;
 	let removing = '';
 </script>
@@ -50,8 +51,8 @@
 					</button>
 				</div>
 			</form>
-			{#if form?.error}
-				<p class="error">{form.error}</p>
+			{#if af?.error}
+				<p class="error">{af.error}</p>
 			{/if}
 		</div>
 

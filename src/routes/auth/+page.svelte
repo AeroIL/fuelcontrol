@@ -4,10 +4,11 @@
 
 	export let form: ActionData;
 
-	// After sendOtp succeeds, server returns { step: 'otp', phone }
-	// We keep local state for the OTP step
-	let step: 'phone' | 'otp' = (form as any)?.step === 'otp' ? 'otp' : 'phone';
-	let phone: string = (form as any)?.phone ?? '';
+	// Cast once in script so templates don't need `as any`
+	$: f = form as { step?: string; phone?: string; error?: string } | null;
+
+	let step: 'phone' | 'otp' = f?.step === 'otp' ? 'otp' : 'phone';
+	let phone: string = f?.phone ?? '';
 	let loading = false;
 
 	function onSendResult(result: any) {
@@ -59,8 +60,8 @@
 					/>
 				</div>
 
-				{#if form?.error && (form as any)?.step === 'phone'}
-					<p class="error" role="alert">{form.error}</p>
+				{#if f?.error && f?.step === 'phone'}
+					<p class="error" role="alert">{f.error}</p>
 				{/if}
 
 				<button type="submit" class="btn-primary" disabled={loading}>
@@ -104,8 +105,8 @@
 					/>
 				</div>
 
-				{#if form?.error && (form as any)?.step === 'otp'}
-					<p class="error" role="alert">{form.error}</p>
+				{#if f?.error && f?.step === 'otp'}
+					<p class="error" role="alert">{f.error}</p>
 				{/if}
 
 				<button type="submit" class="btn-primary" disabled={loading}>
