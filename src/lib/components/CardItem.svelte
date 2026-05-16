@@ -192,18 +192,28 @@
 					<table class="tx-table">
 						<thead>
 							<tr>
-								<th>תאריך</th>
+								<th>תאריך / שעה</th>
 								<th>רכב</th>
 								<th>תחנה</th>
+								<th>חברה</th>
+								<th>סוג</th>
 								<th>ליטר</th>
 							</tr>
 						</thead>
 						<tbody>
 							{#each txList as tx}
 								<tr>
-									<td class="col-date">{fmtDate(tx.date)}{tx.time ? ` ${tx.time}` : ''}</td>
+									<td class="col-date">
+										<span>{fmtDate(tx.date)}</span>
+										{#if tx.time}<span class="col-time">{tx.time}</span>{/if}
+									</td>
 									<td class="col-vehicle" dir="ltr">{tx.vehicleNumber || '—'}</td>
-									<td class="col-station">{tx.stationName || '—'}</td>
+									<td class="col-station">
+										{tx.stationName || '—'}
+										{#if tx.branchNumber}<span class="branch">#{tx.branchNumber}</span>{/if}
+									</td>
+									<td class="col-fuel">{tx.fuelType || '—'}</td>
+									<td class="col-type">{tx.transactionType || '—'}</td>
 									<td class="col-liters">{fmt(tx.litersOrCost)}</td>
 								</tr>
 							{/each}
@@ -396,10 +406,14 @@
 	}
 	.tx-table tbody tr { border-top: 1px solid #f1f5f9; transition: background 0.1s; }
 	.tx-table tbody tr:hover { background: #f8fafc; }
-	.tx-table td { padding: 7px 10px; color: #475569; }
+	.tx-table td { padding: 7px 10px; color: #475569; vertical-align: middle; }
 	.col-date { white-space: nowrap; color: #64748b; font-size: 11px; }
+	.col-time { display: block; color: #94a3b8; font-size: 10px; }
 	.col-vehicle { font-family: 'Courier New', monospace; font-weight: 600; color: #1e293b; white-space: nowrap; }
-	.col-station { color: #475569; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.col-station { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.branch { display: block; font-size: 10px; color: #94a3b8; }
+	.col-fuel { white-space: nowrap; color: #475569; }
+	.col-type { white-space: nowrap; color: #94a3b8; font-size: 11px; }
 	.col-liters { font-weight: 700; color: #1d4ed8; white-space: nowrap; text-align: left; }
 
 	/* footer */

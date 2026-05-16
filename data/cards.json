@@ -1,8 +1,136 @@
 [
   {
+    "id": "107686258",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:06:33.071Z",
+    "data": {
+      "serial": "107686258",
+      "cardName": "בנזין 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 0,
+      "usedLiters": 0,
+      "remainingLiters": 50,
+      "lastUsedDate": "21.1.330",
+      "isActive": false,
+      "transactions": []
+    }
+  },
+  {
+    "id": "965055240",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:06:33.071Z",
+    "data": {
+      "serial": "965055240",
+      "cardName": "בנזין 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 0,
+      "usedLiters": 0,
+      "remainingLiters": 50,
+      "lastUsedDate": "21.1.330",
+      "isActive": false,
+      "transactions": []
+    }
+  },
+  {
+    "id": "107687252",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:06:33.070Z",
+    "data": {
+      "serial": "107687252",
+      "cardName": "בנזין 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 0,
+      "usedLiters": 0,
+      "remainingLiters": 50,
+      "lastUsedDate": "21.1.330",
+      "isActive": false,
+      "transactions": []
+    }
+  },
+  {
+    "id": "107688259",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:06:30.047Z",
+    "data": {
+      "serial": "107688259",
+      "cardName": "בנזין 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 0,
+      "usedLiters": 0,
+      "remainingLiters": 50,
+      "lastUsedDate": "21.1.330",
+      "isActive": false,
+      "transactions": []
+    }
+  },
+  {
+    "id": "107689251",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:06:29.237Z",
+    "data": {
+      "serial": "107689251",
+      "cardName": "בנזין 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 0,
+      "usedLiters": 0,
+      "remainingLiters": 50,
+      "lastUsedDate": "21.1.330",
+      "isActive": false,
+      "transactions": []
+    }
+  },
+  {
+    "id": "107685252",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:06:28.746Z",
+    "data": {
+      "serial": "107685252",
+      "cardName": "בנזין 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 193.19,
+      "usedLiters": 23.22,
+      "remainingLiters": 26.78,
+      "lastUsedDate": "16/05/2026",
+      "isActive": false,
+      "transactions": []
+    }
+  },
+  {
+    "id": "949338249",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:06:37.257Z",
+    "data": {
+      "serial": "949338249",
+      "cardName": "סולר 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 0,
+      "usedLiters": 0,
+      "remainingLiters": 50,
+      "lastUsedDate": "21.1.330",
+      "isActive": false,
+      "transactions": []
+    }
+  },
+  {
+    "id": "949337242",
+    "holderName": "",
+    "lastFetched": "2026-05-16T21:06:38.354Z",
+    "data": {
+      "serial": "949337242",
+      "cardName": "סולר 50 ליטר",
+      "cardType": "קש דלק",
+      "totalUsedLiters": 439.63,
+      "usedLiters": 35.83,
+      "remainingLiters": 14.17,
+      "lastUsedDate": "16/05/2026",
+      "isActive": false,
+      "transactions": []
+    }
+  },
+  {
     "id": "949339246",
     "holderName": "",
-    "lastFetched": "2026-05-16T20:46:22.281Z",
+    "lastFetched": "2026-05-16T21:06:37.489Z",
     "data": {
       "serial": "949339246",
       "cardName": "סולר 50 ליטר",
@@ -18,7 +146,7 @@
   {
     "id": "965054247",
     "holderName": "",
-    "lastFetched": "2026-05-16T20:46:22.073Z",
+    "lastFetched": "2026-05-16T21:06:37.412Z",
     "data": {
       "serial": "965054247",
       "cardName": "בנזין 50 ליטר",

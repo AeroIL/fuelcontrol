@@ -144,43 +144,49 @@ function parseHtml(html: string, cardId: string): FuelCard {
 	if (dateMatch) lastUsedDate = dateMatch[1];
 
 	// ── 3. Transaction table ─────────────────────────────────────────────────
-	// Unique fingerprint: the header row contains the English text "branch_number"
-	// and/or "station_name" — these are Goodi's own column identifiers.
+	// Goodi uses Telerik RadGrid which splits the grid into three sibling tables:
+	//   <id>_Header  — column header row
+	//   <id>         — data rows
+	//   <id>_Pager   — pagination
+	// We find the _Header table by the "branch_number" / "station_name" fingerprint,
+	// strip "_Header" to get the data table id, then read rows from there.
 	const transactions: FuelTransaction[] = [];
 
-	$('table').each((_ti, table) => {
-		const rows = $(table).find('tr');
-		if (rows.length < 2) return;
-
-		let hdrIdx = -1;
+	const buildColMap = (cells: cheerio.Cheerio<cheerio.Element>): Record<string, number> => {
 		const colMap: Record<string, number> = {};
-
-		rows.each((ri, row) => {
-			if (hdrIdx >= 0) return;
-			const cells = $(row).find('th, td');
-			const texts = cells.toArray().map((c) => ct($, c as cheerio.Element).toLowerCase());
-			const joined = texts.join('§');
-
-			if (!joined.includes('branch_number') && !joined.includes('station_name')) return;
-
-			hdrIdx = ri;
-			texts.forEach((t, i) => {
-				if (t.includes('branch_number')) colMap['branch'] = i;
-				else if (t.includes('station_name')) colMap['station'] = i;
-				else if (/תאריך/.test(t)) colMap['date'] = i;
-				else if (/שעה/.test(t)) colMap['time'] = i;
-				else if (/סיריאל|מטפר/.test(t)) colMap['serial'] = i;
-				else if (/ליטר|כ.ליטר/.test(t)) colMap['liters'] = i;
-				else if (/רכב/.test(t)) colMap['vehicle'] = i;
-				else if (/חגרת|חברת|דלק/.test(t)) colMap['fuelType'] = i;
-				else if (/סוג.ה|התקן|עסקה/.test(t)) colMap['txType'] = i;
-			});
+		cells.toArray().forEach((c, i) => {
+			const t = ct($, c as cheerio.Element).toLowerCase();
+			if (t.includes('branch_number')) colMap['branch'] = i;
+			else if (t.includes('station_name')) colMap['station'] = i;
+			else if (/תאריך/.test(t)) colMap['date'] = i;
+			else if (/שעה/.test(t)) colMap['time'] = i;
+			else if (/סיריאל|מטפר/.test(t)) colMap['serial'] = i;
+			else if (/ליטר/.test(t)) colMap['liters'] = i;
+			else if (/רכב/.test(t)) colMap['vehicle'] = i;
+			else if (/חברת|דלק/.test(t)) colMap['fuelType'] = i;
+			else if (/התקן|עסקה/.test(t)) colMap['txType'] = i;
 		});
+		return colMap;
+	};
 
-		if (hdrIdx < 0) return;
+	$('table').each((_ti, hdrTable) => {
+		const hdrId = $(hdrTable).attr('id') ?? '';
+		// Must be the _Header table with branch_number in it
+		if (!hdrId.endsWith('_Header')) return;
+		const hdrText = $(hdrTable).html() ?? '';
+		if (!hdrText.includes('branch_number') && !hdrText.includes('station_name')) return;
 
-		rows.each((ri, row) => {
-			if (ri <= hdrIdx) return;
+		// Build column map from the header row
+		const hdrCells = $(hdrTable).find('tr').first().find('th, td');
+		const colMap = buildColMap(hdrCells);
+		if (Object.keys(colMap).length === 0) return;
+
+		// The data table has the same id without "_Header"
+		const dataTableId = hdrId.slice(0, -'_Header'.length);
+		const dataTable = $(`#${CSS.escape(dataTableId)}`);
+		if (!dataTable.length) return;
+
+		dataTable.find('tr').each((_ri, row) => {
 			const cells = $(row).find('td');
 			if (cells.length < 3) return;
 
@@ -194,7 +200,7 @@ function parseHtml(html: string, cardId: string): FuelCard {
 			const litersRaw = get('liters').replace(/,/g, '');
 			const liters = parseFloat(litersRaw) || 0;
 
-			// Skip pager / calendar rows: must have a real date
+			// Skip non-data rows (pager, calendar): need a real date or nonzero liters
 			if (!/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/.test(dateVal) && liters === 0) return;
 
 			transactions.push({
