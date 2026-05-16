@@ -89,11 +89,16 @@ function parseHtml(html: string, cardId: string): FuelCard {
 	const $ = cheerio.load(html);
 
 	let cardType = 'קש דלק';
+	let cardName = '';
 	let totalUsedLiters = 0;
 	let usedLiters = 0;
 	let remainingLiters = 0;
 	let lastUsedDate = '';
 	let isActive = false;
+
+	// ── 0. Card name ("שם כרטיס") e.g. "סולר 50 ליטר" ──────────────────────
+	const cardNameEl = $('[title*="שם כרטיס"]');
+	if (cardNameEl.length) cardName = ct($, cardNameEl[0] as cheerio.Element);
 
 	// ── 1. Summary row ──────────────────────────────────────────────────────
 	// Find the row where ONE cell's text is EXACTLY the cardId (the S/N cell).
@@ -208,6 +213,7 @@ function parseHtml(html: string, cardId: string): FuelCard {
 
 	return {
 		serial: cardId,
+		cardName,
 		cardType: cardType || 'קש דלק',
 		totalUsedLiters,
 		usedLiters,

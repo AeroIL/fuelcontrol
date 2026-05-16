@@ -14,10 +14,18 @@
 	let editingName = false;
 	let nameInput = card.holderName;
 	let deleteConfirm = false;
+	let txOpen = false;
 
 	$: d = card.data;
 	$: txList = d.transactions ?? [];
 	$: lastTx = txList[0] ?? null;
+	$: fuelLabel = (() => {
+		const n = (d.cardName || '').toLowerCase();
+		if (/סולר|diesel/i.test(n)) return { text: 'סולר 🛢', cls: 'fuel-diesel' };
+		if (/95/.test(n)) return { text: 'בנזין 95 ⛽', cls: 'fuel-95' };
+		if (/בנזין/.test(n)) return { text: 'בנזין ⛽', cls: 'fuel-95' };
+		return null;
+	})();
 	$: slice = (d.usedLiters || 0) + (d.remainingLiters || 0);
 	$: remainPct = slice > 0 ? Math.min(100, (d.remainingLiters / slice) * 100) : 0;
 	$: gaugeColor =
@@ -132,6 +140,7 @@
 	<div class="id-strip">
 		<span class="card-id" dir="ltr">{card.id}</span>
 		<div class="badges">
+			{#if fuelLabel}<span class="badge {fuelLabel.cls}">{fuelLabel.text}</span>{/if}
 			{#if d.cardType}<span class="badge">{d.cardType}</span>{/if}
 			<span class="badge" class:active={d.isActive}>{d.isActive ? 'פעיל' : 'לא פעיל'}</span>
 		</div>
@@ -171,19 +180,37 @@
 		</div>
 	{/if}
 
-	<!-- recent history (up to 5 previous transactions) -->
-	{#if txList.length > 1}
-		<div class="history-section">
-			<p class="section-label">היסטוריה</p>
-			<ul class="tx-list">
-				{#each txList.slice(1, 6) as tx}
-					<li class="tx-row">
-						<span class="tx-date">{fmtDate(tx.date)}</span>
-						<span class="tx-station">{tx.stationName || '—'}</span>
-						<span class="tx-liters">{fmt(tx.litersOrCost)} ל'</span>
-					</li>
-				{/each}
-			</ul>
+	<!-- transactions dropdown -->
+	{#if txList.length > 0}
+		<div class="tx-section">
+			<button class="tx-toggle" on:click={() => (txOpen = !txOpen)}>
+				<span>🧾 עסקאות ({txList.length})</span>
+				<span class="chevron" class:open={txOpen}>▾</span>
+			</button>
+			{#if txOpen}
+				<div class="tx-table-wrap">
+					<table class="tx-table">
+						<thead>
+							<tr>
+								<th>תאריך</th>
+								<th>רכב</th>
+								<th>תחנה</th>
+								<th>ליטר</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each txList as tx}
+								<tr>
+									<td class="col-date">{fmtDate(tx.date)}{tx.time ? ` ${tx.time}` : ''}</td>
+									<td class="col-vehicle" dir="ltr">{tx.vehicleNumber || '—'}</td>
+									<td class="col-station">{tx.stationName || '—'}</td>
+									<td class="col-liters">{fmt(tx.litersOrCost)}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
 		</div>
 	{/if}
 
@@ -340,19 +367,40 @@
 	.last-station { font-size: 13px; color: #475569; margin-bottom: 2px; }
 	.last-vehicle { font-size: 12px; color: #94a3b8; }
 
-	/* history */
-	.history-section { padding: 10px 14px 6px; }
-	.tx-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-	.tx-row {
-		display: grid;
-		grid-template-columns: 80px 1fr auto;
-		gap: 6px;
-		align-items: center;
-		font-size: 12px;
+	/* fuel type badges */
+	.badge.fuel-diesel { background: #fef9c3; color: #713f12; }
+	.badge.fuel-95 { background: #dbeafe; color: #1e40af; }
+
+	/* transactions dropdown */
+	.tx-section { border-top: 1px solid #f1f5f9; }
+	.tx-toggle {
+		width: 100%; display: flex; justify-content: space-between; align-items: center;
+		padding: 10px 14px; font-size: 13px; font-weight: 600; color: #475569;
+		background: none; text-align: right;
+		transition: background 0.13s;
 	}
-	.tx-date { color: #64748b; font-variant-numeric: tabular-nums; white-space: nowrap; }
-	.tx-station { color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-	.tx-liters { color: #1d4ed8; font-weight: 600; text-align: start; white-space: nowrap; }
+	.tx-toggle:hover { background: #f8fafc; }
+	.chevron { font-size: 16px; transition: transform 0.2s; display: inline-block; }
+	.chevron.open { transform: rotate(180deg); }
+
+	.tx-table-wrap { overflow-x: auto; border-top: 1px solid #f1f5f9; }
+	.tx-table {
+		width: 100%; border-collapse: collapse;
+		font-size: 12px; text-align: right;
+	}
+	.tx-table thead tr { background: #f8fafc; }
+	.tx-table th {
+		padding: 7px 10px; font-size: 11px; font-weight: 700;
+		color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;
+		white-space: nowrap;
+	}
+	.tx-table tbody tr { border-top: 1px solid #f1f5f9; transition: background 0.1s; }
+	.tx-table tbody tr:hover { background: #f8fafc; }
+	.tx-table td { padding: 7px 10px; color: #475569; }
+	.col-date { white-space: nowrap; color: #64748b; font-size: 11px; }
+	.col-vehicle { font-family: 'Courier New', monospace; font-weight: 600; color: #1e293b; white-space: nowrap; }
+	.col-station { color: #475569; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.col-liters { font-weight: 700; color: #1d4ed8; white-space: nowrap; text-align: left; }
 
 	/* footer */
 	.card-footer {

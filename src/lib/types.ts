@@ -1,5 +1,6 @@
 export interface FuelCard {
 	serial: string;
+	cardName: string;
 	cardType: string;
 	totalUsedLiters: number;
 	usedLiters: number;

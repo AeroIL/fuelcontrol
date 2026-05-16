@@ -2,9 +2,10 @@
   {
     "id": "949339246",
     "holderName": "",
-    "lastFetched": "2026-05-16T20:40:51.966Z",
+    "lastFetched": "2026-05-16T20:46:22.281Z",
     "data": {
       "serial": "949339246",
+      "cardName": "סולר 50 ליטר",
       "cardType": "קש דלק",
       "totalUsedLiters": 0,
       "usedLiters": 0,
@@ -17,9 +18,10 @@
   {
     "id": "965054247",
     "holderName": "",
-    "lastFetched": "2026-05-16T20:40:52.061Z",
+    "lastFetched": "2026-05-16T20:46:22.073Z",
     "data": {
       "serial": "965054247",
+      "cardName": "בנזין 50 ליטר",
       "cardType": "קש דלק",
       "totalUsedLiters": 311.28,
       "usedLiters": 37.413,
