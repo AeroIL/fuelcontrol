@@ -4,6 +4,11 @@
 	import CameraScanner from '$lib/components/CameraScanner.svelte';
 	import CardItem from '$lib/components/CardItem.svelte';
 	import type { SavedCard } from '$lib/types';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
+	$: phone = data.phone;
+	$: isAdmin = data.isAdmin;
 
 	let cards: SavedCard[] = [];
 	let refreshingIds = new Set<string>();
@@ -14,6 +19,11 @@
 	let scanFlash = false;
 	let toast = '';
 	let toastTimer: ReturnType<typeof setTimeout>;
+
+	async function logout() {
+		await fetch('/api/auth/logout', { method: 'POST' });
+		window.location.href = '/auth';
+	}
 
 	// Filters
 	type FuelFilter = 'all' | 'diesel' | 'gasoline';
@@ -174,32 +184,49 @@
 					<p class="logo-sub">Goodi Fuel Control</p>
 				</div>
 			</div>
-			{#if cards.length > 0}
-				<button
-					class="btn-refresh-all"
-					on:click={refreshAll}
-					disabled={refreshingIds.size > 0}
-					title="רענן את כל הכרטיסים"
-				>
-					<svg
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2.5"
-						width="16"
-						height="16"
-						class:spin={refreshingIds.size > 0}
-						aria-hidden="true"
+			<div class="header-actions">
+				{#if cards.length > 0}
+					<button
+						class="btn-refresh-all"
+						on:click={refreshAll}
+						disabled={refreshingIds.size > 0}
+						title="רענן את כל הכרטיסים"
 					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-						/>
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							width="16"
+							height="16"
+							class:spin={refreshingIds.size > 0}
+							aria-hidden="true"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+							/>
+						</svg>
+						<span>רענן הכל</span>
+					</button>
+				{/if}
+				{#if isAdmin}
+					<a href="/admin" class="btn-header-icon" title="ניהול הרשאות">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+							<circle cx="9" cy="7" r="4"/>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M16 3.13a4 4 0 0 1 0 7.75"/>
+						</svg>
+					</a>
+				{/if}
+				<button class="btn-header-icon" title="יציאה" on:click={logout}>
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
 					</svg>
-					<span>רענן הכל</span>
 				</button>
-			{/if}
+			</div>
 		</div>
 	</header>
 
@@ -330,6 +357,28 @@
 		justify-content: space-between;
 		gap: 12px;
 	}
+
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.btn-header-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		color: rgba(255, 255, 255, 0.9);
+		transition: background 0.15s;
+		text-decoration: none;
+		flex-shrink: 0;
+	}
+	.btn-header-icon:hover { background: rgba(255, 255, 255, 0.2); }
 
 	.logo {
 		display: flex;
