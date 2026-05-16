@@ -43,7 +43,7 @@ export const actions: Actions = {
 	verifyOtp: async ({ request, cookies }) => {
 		const data = await request.formData();
 		const phone = normalizePhone(String(data.get('phone') ?? '').trim());
-		const otp = String(data.get('otp') ?? '').trim();
+		const otp = String(data.get('otp') ?? '').replace(/\D/g, '').trim();
 
 		if (!verifyOtp(phone, otp)) {
 			return fail(401, { error: 'קוד שגוי או פג תוקף', step: 'otp', phone });

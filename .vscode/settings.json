@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd C:/Users/Aerot/Documents/fuelcontrol && git push$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

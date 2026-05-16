@@ -96,7 +96,6 @@
 						type="text"
 						inputmode="numeric"
 						placeholder="——————"
-						pattern="\d{6}"
 						maxlength="6"
 						required
 						autocomplete="one-time-code"
