@@ -130,12 +130,14 @@
 
 <style>
 	.page {
+		width: 100%;
 		min-height: 100vh;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		background: #f1f5f9;
 		padding: 20px;
+		box-sizing: border-box;
 	}
 
 	.card {

@@ -89,9 +89,11 @@
 
 <style>
 	.page {
+		width: 100%;
 		min-height: 100vh;
 		background: #f1f5f9;
 		padding: 20px 16px 60px;
+		box-sizing: border-box;
 	}
 	.container {
 		max-width: 480px;

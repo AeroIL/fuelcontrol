@@ -333,6 +333,7 @@
 <style>
 	/* ── Layout ── */
 	.app {
+		width: 100%;
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
@@ -340,6 +341,7 @@
 
 	/* ── App header ── */
 	.app-header {
+		width: 100%;
 		background: #0f172a;
 		color: #fff;
 		box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06), 0 2px 12px rgba(0, 0, 0, 0.3);
@@ -438,9 +440,9 @@
 	/* ── Main ── */
 	main {
 		flex: 1;
-		max-width: 1200px;
 		width: 100%;
-		margin: 0 auto;
+		max-width: 1200px;
+		align-self: center;
 		padding: 20px 16px 48px;
 		display: flex;
 		flex-direction: column;
