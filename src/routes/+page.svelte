@@ -15,6 +15,23 @@
 	let toast = '';
 	let toastTimer: ReturnType<typeof setTimeout>;
 
+	// Filters
+	type FuelFilter = 'all' | 'diesel' | 'gasoline';
+	type FillFilter = 'all' | 'full' | 'partial' | 'empty';
+	let fuelFilter: FuelFilter = 'all';
+	let fillFilter: FillFilter = 'all';
+
+	$: filteredCards = cards.filter((c) => {
+		const name = (c.data?.cardName ?? '').toLowerCase();
+		if (fuelFilter === 'diesel' && !/סולר|diesel/i.test(name)) return false;
+		if (fuelFilter === 'gasoline' && !/בנזין|gasoline|95/i.test(name)) return false;
+		const rem = c.data?.remainingLiters ?? 0;
+		if (fillFilter === 'full' && rem <= 50) return false;
+		if (fillFilter === 'partial' && (rem < 1 || rem >= 50)) return false;
+		if (fillFilter === 'empty' && rem >= 1) return false;
+		return true;
+	});
+
 	onMount(async () => {
 		await loadCards();
 	});
@@ -239,20 +256,44 @@
 				<p>סרוק ברקוד כרטיס או הכנס מספר כרטיס כדי להתחיל</p>
 			</div>
 		{:else}
-			<div class="section-heading">
-				<h2>כרטיסים שמורים <span class="count">({cards.length})</span></h2>
+			<!-- Filter bar -->
+			<div class="filter-bar">
+				<div class="filter-group">
+					<span class="filter-label">דלק</span>
+					<button class="filter-btn" class:active={fuelFilter === 'all'} on:click={() => (fuelFilter = 'all')}>הכל</button>
+					<button class="filter-btn diesel" class:active={fuelFilter === 'diesel'} on:click={() => (fuelFilter = 'diesel')}>סולר 🛢</button>
+					<button class="filter-btn gas" class:active={fuelFilter === 'gasoline'} on:click={() => (fuelFilter = 'gasoline')}>בנזין ⛽</button>
+				</div>
+				<div class="filter-sep"></div>
+				<div class="filter-group">
+					<span class="filter-label">מילוי</span>
+					<button class="filter-btn" class:active={fillFilter === 'all'} on:click={() => (fillFilter = 'all')}>הכל</button>
+					<button class="filter-btn full" class:active={fillFilter === 'full'} on:click={() => (fillFilter = 'full')}>מלא &gt;50ל'</button>
+					<button class="filter-btn partial" class:active={fillFilter === 'partial'} on:click={() => (fillFilter = 'partial')}>1–50ל'</button>
+					<button class="filter-btn empty" class:active={fillFilter === 'empty'} on:click={() => (fillFilter = 'empty')}>ריק &lt;1ל'</button>
+				</div>
+				<span class="filter-count">{filteredCards.length} / {cards.length}</span>
 			</div>
-			<div class="cards-grid">
-				{#each cards as card (card.id)}
-					<CardItem
-						{card}
-						refreshing={refreshingIds.has(card.id)}
-						on:delete={(e) => deleteCard(e.detail)}
-						on:updateHolder={(e) => updateHolder(e.detail.id, e.detail.name)}
-						on:refresh={(e) => refreshCard(e.detail)}
-					/>
-				{/each}
-			</div>
+
+			{#if filteredCards.length === 0}
+				<div class="empty-state">
+					<div class="empty-icon">🔍</div>
+					<h2>אין כרטיסים תואמים</h2>
+					<p>שנה את הפילטרים כדי לראות כרטיסים</p>
+				</div>
+			{:else}
+				<div class="cards-grid">
+					{#each filteredCards as card (card.id)}
+						<CardItem
+							{card}
+							refreshing={refreshingIds.has(card.id)}
+							on:delete={(e) => deleteCard(e.detail)}
+							on:updateHolder={(e) => updateHolder(e.detail.id, e.detail.name)}
+							on:refresh={(e) => refreshCard(e.detail)}
+						/>
+					{/each}
+				</div>
+			{/if}
 		{/if}
 	</main>
 
@@ -492,6 +533,61 @@
 	.count {
 		color: #94a3b8;
 		font-weight: 500;
+	}
+
+	/* ── Filter bar ── */
+	.filter-bar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px;
+		background: #fff;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
+		padding: 10px 14px;
+	}
+	.filter-group {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		flex-wrap: wrap;
+	}
+	.filter-label {
+		font-size: 11px;
+		font-weight: 700;
+		color: #94a3b8;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		margin-left: 4px;
+	}
+	.filter-sep {
+		width: 1px;
+		height: 20px;
+		background: #e2e8f0;
+		margin: 0 4px;
+	}
+	.filter-btn {
+		padding: 4px 12px;
+		border-radius: 20px;
+		font-size: 12px;
+		font-weight: 600;
+		color: #64748b;
+		background: #f1f5f9;
+		transition: background 0.13s, color 0.13s;
+		white-space: nowrap;
+	}
+	.filter-btn:hover { background: #e2e8f0; }
+	.filter-btn.active { background: #1d4ed8; color: #fff; }
+	.filter-btn.diesel.active { background: #92400e; color: #fff; }
+	.filter-btn.gas.active { background: #1d4ed8; color: #fff; }
+	.filter-btn.full.active { background: #15803d; color: #fff; }
+	.filter-btn.partial.active { background: #ea580c; color: #fff; }
+	.filter-btn.empty.active { background: #dc2626; color: #fff; }
+	.filter-count {
+		margin-right: auto;
+		font-size: 12px;
+		color: #94a3b8;
+		font-weight: 600;
 	}
 
 	/* ── Cards grid ── */

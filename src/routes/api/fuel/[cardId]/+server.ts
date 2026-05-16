@@ -183,7 +183,8 @@ function parseHtml(html: string, cardId: string): FuelCard {
 
 		// The data table has the same id without "_Header"
 		const dataTableId = hdrId.slice(0, -'_Header'.length);
-		const dataTable = $(`#${CSS.escape(dataTableId)}`);
+		// Use attribute selector to avoid CSS.escape (not available in Node.js)
+		const dataTable = $(`[id="${dataTableId}"]`).filter('table');
 		if (!dataTable.length) return;
 
 		dataTable.find('tr').each((_ri, row) => {
