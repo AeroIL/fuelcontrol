@@ -162,6 +162,49 @@
 		if (e.key === 'Enter') addCard();
 	}
 
+	// ── Bulk edit ──
+	let bulkMode = false;
+	let selectedIds = new Set<string>();
+	let bulkName = '';
+	let bulkApplying = false;
+
+	$: allSelected = displayedCards.length > 0 && displayedCards.every((c) => selectedIds.has(c.id));
+
+	function toggleBulkMode() {
+		bulkMode = !bulkMode;
+		selectedIds = new Set();
+		bulkName = '';
+	}
+
+	function toggleSelect(id: string) {
+		const s = new Set(selectedIds);
+		if (s.has(id)) s.delete(id); else s.add(id);
+		selectedIds = s;
+	}
+
+	function selectAll() {
+		if (allSelected) {
+			selectedIds = new Set();
+		} else {
+			selectedIds = new Set(displayedCards.map((c) => c.id));
+		}
+	}
+
+	async function bulkApply() {
+		const name = bulkName.trim();
+		if (!name || selectedIds.size === 0) return;
+		bulkApplying = true;
+		try {
+			await Promise.all([...selectedIds].map((id) => updateHolder(id, name)));
+			showToast(`שם עודכן ל‑${selectedIds.size} כרטיסים ✓`);
+			bulkMode = false;
+			selectedIds = new Set();
+			bulkName = '';
+		} finally {
+			bulkApplying = false;
+		}
+	}
+
 	function showToast(msg: string) {
 		toast = msg;
 		clearTimeout(toastTimer);
@@ -284,7 +327,51 @@
 					<button class="filter-btn empty" class:active={fillFilter === 'empty'} on:click={() => (fillFilter = 'empty')}>ריק &lt;1ל'</button>
 				</div>
 				<span class="filter-count">{filteredCards.length} / {cards.length}</span>
+				<button
+					class="btn-bulk-toggle"
+					class:active={bulkMode}
+					on:click={toggleBulkMode}
+					title="עריכה קבוצתית של שם מחזיק"
+				>
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" aria-hidden="true">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+					</svg>
+					עריכה קבוצתית
+				</button>
 			</div>
+
+			<!-- Bulk edit panel -->
+			{#if bulkMode}
+				<div class="bulk-panel">
+					<label class="bulk-select-all">
+						<input type="checkbox" checked={allSelected} on:change={selectAll} />
+						<span>בחר הכל ({displayedCards.length})</span>
+					</label>
+					{#if selectedIds.size > 0}
+						<span class="bulk-count-badge">{selectedIds.size} נבחרו</span>
+					{/if}
+					<div class="bulk-name-row">
+						<input
+							type="text"
+							placeholder="שם מחזיק הכרטיסים..."
+							bind:value={bulkName}
+							class="bulk-name-input"
+							on:keydown={(e) => e.key === 'Enter' && bulkApply()}
+						/>
+						<button
+							class="btn-bulk-apply"
+							on:click={bulkApply}
+							disabled={!bulkName.trim() || selectedIds.size === 0 || bulkApplying}
+						>
+							{#if bulkApplying}
+								<span class="spinner"></span>
+							{:else}
+								החל
+							{/if}
+						</button>
+					</div>
+				</div>
+			{/if}
 
 			<!-- Card search -->
 			<div class="card-search-wrap">
@@ -312,13 +399,33 @@
 			{:else}
 				<div class="cards-grid">
 					{#each displayedCards as card (card.id)}
-						<CardItem
-							{card}
-							refreshing={refreshingIds.has(card.id)}
-							on:delete={(e) => deleteCard(e.detail)}
-							on:updateHolder={(e) => updateHolder(e.detail.id, e.detail.name)}
-							on:refresh={(e) => refreshCard(e.detail)}
-						/>
+						<div
+							class="card-select-wrap"
+							class:bulk-active={bulkMode}
+							class:is-selected={selectedIds.has(card.id)}
+							on:click={() => bulkMode && toggleSelect(card.id)}
+							on:keydown={(e) => bulkMode && e.key === ' ' && toggleSelect(card.id)}
+							role={bulkMode ? 'checkbox' : undefined}
+							aria-checked={bulkMode ? selectedIds.has(card.id) : undefined}
+							tabindex={bulkMode ? 0 : undefined}
+						>
+							{#if bulkMode}
+								<div class="card-checkbox" aria-hidden="true">
+									{#if selectedIds.has(card.id)}
+										<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="14" height="14">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+										</svg>
+									{/if}
+								</div>
+							{/if}
+							<CardItem
+								{card}
+								refreshing={refreshingIds.has(card.id)}
+								on:delete={(e) => deleteCard(e.detail)}
+								on:updateHolder={(e) => updateHolder(e.detail.id, e.detail.name)}
+								on:refresh={(e) => refreshCard(e.detail)}
+							/>
+						</div>
 					{/each}
 				</div>
 			{/if}
@@ -570,6 +677,135 @@
 		padding: 0 4px;
 	}
 	.search-clear:hover { color: #475569; }
+
+	/* ── Bulk edit ── */
+	.btn-bulk-toggle {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		padding: 4px 10px;
+		border-radius: 20px;
+		font-size: 12px;
+		font-weight: 600;
+		color: #64748b;
+		background: #f1f5f9;
+		transition: background 0.13s, color 0.13s;
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+	.btn-bulk-toggle:hover { background: #e2e8f0; }
+	.btn-bulk-toggle.active { background: #7c3aed; color: #fff; }
+
+	.bulk-panel {
+		background: #faf5ff;
+		border: 1.5px solid #ddd6fe;
+		border-radius: 14px;
+		padding: 14px 16px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 10px;
+	}
+	.bulk-select-all {
+		display: flex;
+		align-items: center;
+		gap: 7px;
+		font-size: 13px;
+		font-weight: 600;
+		color: #4c1d95;
+		cursor: pointer;
+		user-select: none;
+	}
+	.bulk-select-all input[type='checkbox'] {
+		width: 16px;
+		height: 16px;
+		cursor: pointer;
+		accent-color: #7c3aed;
+	}
+	.bulk-count-badge {
+		background: #7c3aed;
+		color: #fff;
+		border-radius: 20px;
+		padding: 2px 10px;
+		font-size: 12px;
+		font-weight: 700;
+	}
+	.bulk-name-row {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+		flex: 1;
+		min-width: 220px;
+	}
+	.bulk-name-input {
+		flex: 1;
+		height: 38px;
+		border: 1.5px solid #c4b5fd;
+		border-radius: 10px;
+		padding: 0 12px;
+		font-size: 14px;
+		outline: none;
+		background: #fff;
+		color: #0f172a;
+		transition: border-color 0.2s, box-shadow 0.2s;
+	}
+	.bulk-name-input:focus {
+		border-color: #7c3aed;
+		box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+	}
+	.btn-bulk-apply {
+		height: 38px;
+		padding: 0 18px;
+		background: #7c3aed;
+		color: #fff;
+		border-radius: 10px;
+		font-size: 14px;
+		font-weight: 600;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 64px;
+		transition: background 0.15s;
+		flex-shrink: 0;
+	}
+	.btn-bulk-apply:hover:not(:disabled) { background: #6d28d9; }
+	.btn-bulk-apply:disabled { opacity: 0.55; cursor: not-allowed; }
+
+	/* ── Card selection wrapper ── */
+	.card-select-wrap {
+		position: relative;
+	}
+	.card-select-wrap.bulk-active {
+		cursor: pointer;
+		border-radius: 18px;
+		transition: box-shadow 0.15s;
+	}
+	.card-select-wrap.bulk-active:hover {
+		box-shadow: 0 0 0 2px #c4b5fd;
+	}
+	.card-select-wrap.is-selected {
+		box-shadow: 0 0 0 3px #7c3aed !important;
+	}
+	.card-checkbox {
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		z-index: 10;
+		width: 22px;
+		height: 22px;
+		border-radius: 6px;
+		background: #fff;
+		border: 2px solid #c4b5fd;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: background 0.15s, border-color 0.15s;
+		pointer-events: none;
+	}
+	.is-selected .card-checkbox {
+		background: #7c3aed;
+		border-color: #7c3aed;
+	}
 
 	/* ── Btn add ── */
 
