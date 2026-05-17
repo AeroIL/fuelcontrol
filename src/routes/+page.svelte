@@ -210,6 +210,60 @@
 		clearTimeout(toastTimer);
 		toastTimer = setTimeout(() => (toast = ''), 2500);
 	}
+
+	// ── Export ──
+	function buildExportText(src: SavedCard[]): string {
+		const benzin = src.filter((c) => {
+			const n = (c.data?.cardName ?? '').toLowerCase();
+			return /בנזין|gasoline|95/i.test(n);
+		});
+		const solar = src.filter((c) => {
+			const n = (c.data?.cardName ?? '').toLowerCase();
+			return /סולר|diesel/i.test(n);
+		});
+		const other = src.filter((c) => {
+			const n = (c.data?.cardName ?? '').toLowerCase();
+			return !/בנזין|gasoline|95|סולר|diesel/i.test(n);
+		});
+
+		function fmt(rem: number): string {
+			if (rem == null || isNaN(rem)) return '—';
+			return rem.toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ל'";
+		}
+		function section(label: string, group: SavedCard[]): string {
+			if (group.length === 0) return '';
+			const rows = group
+				.map((c) => `${c.id}  ${fmt(Number(c.data?.remainingLiters ?? 0))}`)
+				.join('\n');
+			return `${label} ${group.length}:\n${rows}`;
+		}
+
+		return [
+			section('בנזין', benzin),
+			section('סולר', solar),
+			section('אחר', other)
+		].filter(Boolean).join('\n\n');
+	}
+
+	async function copyExport() {
+		const text = buildExportText(cards);
+		if (!text) { showToast('אין כרטיסים'); return; }
+		try {
+			await navigator.clipboard.writeText(text);
+			showToast('הטקסט הועתק ✓');
+		} catch {
+			// fallback
+			const ta = document.createElement('textarea');
+			ta.value = text;
+			ta.style.position = 'fixed';
+			ta.style.opacity = '0';
+			document.body.appendChild(ta);
+			ta.select();
+			document.execCommand('copy');
+			document.body.removeChild(ta);
+			showToast('הטקסט הועתק ✓');
+		}
+	}
 </script>
 
 <svelte:head>
@@ -229,6 +283,17 @@
 			</div>
 			<div class="header-actions">
 				{#if cards.length > 0}
+					<button
+						class="btn-header-icon"
+						on:click={copyExport}
+						title="ייצוא לטקסט"
+						aria-label="ייצא סיכום"
+					>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+							<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+						</svg>
+					</button>
 					<button
 						class="btn-refresh-all"
 						on:click={refreshAll}
