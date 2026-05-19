@@ -24,6 +24,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	event.locals.phone = phone;
-	event.locals.base = getPhoneBase(phone) ?? '1';
+	event.locals.base = getPhoneBase(phone); // null for admin (no fixed base)
 	return resolve(event);
 };

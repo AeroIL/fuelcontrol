@@ -10,10 +10,10 @@
 	$: isAdmin = data.isAdmin;
 
 	// Admin can switch which base they're viewing
-	let viewBase: '1' | '2' = (data.base as '1' | '2') ?? '1';
+	let viewBase: string = data.base ?? data.bases[0]?.id ?? '1';
 	$: baseParam = isAdmin ? `?base=${viewBase}` : '';
 
-	function switchBase(b: '1' | '2') {
+	function switchBase(b: string) {
 		if (viewBase === b) return;
 		viewBase = b;
 		cards = [];
@@ -295,16 +295,13 @@
 			<div class="header-actions">
 				{#if isAdmin}
 					<div class="base-switcher" role="group" aria-label="בחר בסיס">
-						<button
-							class="base-btn"
-							class:active={viewBase === '1'}
-							on:click={() => switchBase('1')}
-						>בסיס 1</button>
-						<button
-							class="base-btn"
-							class:active={viewBase === '2'}
-							on:click={() => switchBase('2')}
-						>בסיס 2</button>
+						{#each data.bases as b (b.id)}
+							<button
+								class="base-btn"
+								class:active={viewBase === b.id}
+								on:click={() => switchBase(b.id)}
+							>{b.name}</button>
+						{/each}
 					</div>
 				{/if}
 				{#if cards.length > 0}

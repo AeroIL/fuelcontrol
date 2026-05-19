@@ -2,13 +2,15 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { readCards, writeCards } from '$lib/server/storage';
 import { ADMIN_PHONE } from '$lib/server/auth';
-import type { Base } from '$lib/server/whitelist';
+import { readBases } from '$lib/server/bases';
 import type { SavedCard } from '$lib/types';
 
-function resolveBase(locals: App.Locals, url: URL): Base {
-        const param = url.searchParams.get('base');
-        if (locals.phone === ADMIN_PHONE && (param === '1' || param === '2')) return param;
-        return locals.base ?? '1';
+function resolveBase(locals: App.Locals, url: URL): string {
+	const param = url.searchParams.get('base');
+	if (locals.phone === ADMIN_PHONE && param) {
+		if (readBases().some((b) => b.id === param)) return param;
+	}
+	return locals.base ?? readBases()[0]?.id ?? '1';
 }
 
 export const GET: RequestHandler = async ({ locals, url }) => {
