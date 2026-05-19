@@ -44,8 +44,12 @@
 				use:enhance={() => {
 					loading = true;
 					return async ({ result, update }) => {
-						await update({ reset: false });
-						onSendResult(result);
+						try {
+							await update({ reset: false });
+							onSendResult(result);
+						} finally {
+							loading = false;
+						}
 					};
 				}}
 			>

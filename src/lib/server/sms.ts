@@ -18,21 +18,28 @@ export async function sendOtp(phone: string, otp: string): Promise<void> {
 	const deviceId = process.env.TEXTBEE_DEVICE_ID;
 	if (!apiKey || !deviceId) throw new Error('TEXTBEE_API_KEY or TEXTBEE_DEVICE_ID not set');
 
-	const url = `https://api.textbee.dev/api/v1/gateway/devices/${deviceId}/send-sms`;
-	const res = await fetch(url, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'x-api-key': apiKey
-		},
-		body: JSON.stringify({
-			recipients: [toE164(phone)],
-			message: `קוד הגישה שלך הוא: ${otp}\nתקף ל-5 דקות בלבד.`
-		})
-	});
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), 10_000);
 
-	if (!res.ok) {
-		const text = await res.text().catch(() => '');
-		throw new Error(`SMS API error ${res.status}: ${text}`);
+	const url = `https://api.textbee.dev/api/v1/gateway/devices/${deviceId}/send-sms`;
+	try {
+		const res = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-api-key': apiKey
+			},
+			body: JSON.stringify({
+				recipients: [toE164(phone)],
+				message: `קוד הגישה שלך הוא: ${otp}\nתקף ל-5 דקות בלבד.`
+			}),
+			signal: controller.signal
+		});
+		if (!res.ok) {
+			const text = await res.text().catch(() => '');
+			throw new Error(`SMS API error ${res.status}: ${text}`);
+		}
+	} finally {
+		clearTimeout(timeout);
 	}
 }
