@@ -9,6 +9,17 @@
 	$: phone = data.phone;
 	$: isAdmin = data.isAdmin;
 
+	// Admin can switch which base they're viewing
+	let viewBase: '1' | '2' = (data.base as '1' | '2') ?? '1';
+	$: baseParam = isAdmin ? `?base=${viewBase}` : '';
+
+	function switchBase(b: '1' | '2') {
+		if (viewBase === b) return;
+		viewBase = b;
+		cards = [];
+		loadCards();
+	}
+
 	let cards: SavedCard[] = [];
 	let refreshingIds = new Set<string>();
 	let addInput = '';
@@ -56,7 +67,7 @@
 
 	async function loadCards() {
 		try {
-			const res = await fetch('/api/cards');
+			const res = await fetch(`/api/cards${baseParam}`);
 			if (res.ok) {
 				cards = await res.json();
 				// Background-refresh all saved cards silently
@@ -81,7 +92,7 @@
 				data: fuelData
 			};
 
-			const saveRes = await fetch('/api/cards', {
+			const saveRes = await fetch(`/api/cards${baseParam}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(payload)
@@ -122,7 +133,7 @@
 				data: fuelData
 			};
 
-			const saveRes = await fetch('/api/cards', {
+			const saveRes = await fetch(`/api/cards${baseParam}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(payload)
@@ -141,13 +152,13 @@
 	}
 
 	async function deleteCard(id: string) {
-		await fetch(`/api/cards/${encodeURIComponent(id)}`, { method: 'DELETE' });
+		await fetch(`/api/cards/${encodeURIComponent(id)}${baseParam}`, { method: 'DELETE' });
 		cards = cards.filter((c) => c.id !== id);
 		showToast('כרטיס נמחק');
 	}
 
 	async function updateHolder(id: string, name: string) {
-		const res = await fetch(`/api/cards/${encodeURIComponent(id)}`, {
+		const res = await fetch(`/api/cards/${encodeURIComponent(id)}${baseParam}`, {
 			method: 'PATCH',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ holderName: name })
@@ -282,6 +293,20 @@
 				</div>
 			</div>
 			<div class="header-actions">
+				{#if isAdmin}
+					<div class="base-switcher" role="group" aria-label="בחר בסיס">
+						<button
+							class="base-btn"
+							class:active={viewBase === '1'}
+							on:click={() => switchBase('1')}
+						>בסיס 1</button>
+						<button
+							class="base-btn"
+							class:active={viewBase === '2'}
+							on:click={() => switchBase('2')}
+						>בסיס 2</button>
+					</div>
+				{/if}
 				{#if cards.length > 0}
 					<button
 						class="btn-header-icon"
@@ -538,6 +563,28 @@
 		align-items: center;
 		gap: 6px;
 	}
+
+	/* ── Base switcher (admin only) ── */
+	.base-switcher {
+		display: flex;
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 8px;
+		overflow: hidden;
+	}
+	.base-btn {
+		padding: 5px 12px;
+		font-size: 12px;
+		font-weight: 700;
+		color: rgba(255, 255, 255, 0.65);
+		background: none;
+		border: none;
+		cursor: pointer;
+		transition: background 0.15s, color 0.15s;
+		white-space: nowrap;
+	}
+	.base-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+	.base-btn.active { background: #2563eb; color: #fff; }
 
 	.btn-header-icon {
 		display: flex;
