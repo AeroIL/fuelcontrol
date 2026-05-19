@@ -32,6 +32,11 @@
 			<p class="sub">Goodi Fuel Control</p>
 		</div>
 
+		<div class="step-dots">
+			<div class="dot" class:active={step === 'phone'}></div>
+			<div class="dot" class:active={step === 'otp'}></div>
+		</div>
+
 		{#if step === 'phone'}
 			<form
 				method="POST"
@@ -136,34 +141,67 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: #f1f5f9;
+		background: linear-gradient(150deg, #0f172a 0%, #1e3554 50%, #0f172a 100%);
 		padding: 20px;
 		box-sizing: border-box;
 	}
 
 	.card {
 		background: #fff;
-		border-radius: 20px;
-		border: 1px solid #e8edf3;
-		padding: 36px 32px;
+		border-radius: 24px;
+		padding: 40px 36px;
 		width: 100%;
-		max-width: 380px;
+		max-width: 390px;
 		display: flex;
 		flex-direction: column;
-		gap: 24px;
-		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+		gap: 26px;
+		box-shadow: 0 24px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08);
 	}
 
+	/* Logo */
 	.logo {
 		text-align: center;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		gap: 8px;
+	}
+	.logo-emoji {
+		font-size: 52px;
+		line-height: 1;
+		filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+	}
+	.logo h1 {
+		font-size: 22px;
+		font-weight: 800;
+		color: #0f172a;
+		letter-spacing: -0.5px;
+	}
+	.logo .sub {
+		font-size: 11px;
+		font-weight: 600;
+		color: #94a3b8;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+	}
+
+	/* Step dots */
+	.step-dots {
+		display: flex;
+		justify-content: center;
 		gap: 6px;
 	}
-	.logo-emoji { font-size: 48px; }
-	.logo h1 { font-size: 20px; font-weight: 700; color: #0f172a; }
-	.logo .sub { font-size: 12px; color: #94a3b8; }
+	.dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: #e2e8f0;
+		transition: background 0.25s, transform 0.25s;
+	}
+	.dot.active {
+		background: #2563eb;
+		transform: scale(1.25);
+	}
 
 	form {
 		display: flex;
@@ -177,15 +215,17 @@
 		gap: 6px;
 	}
 	label {
-		font-size: 13px;
-		font-weight: 600;
-		color: #475569;
+		font-size: 11px;
+		font-weight: 700;
+		color: #64748b;
+		text-transform: uppercase;
+		letter-spacing: 0.6px;
 	}
 	input {
-		height: 48px;
-		border: 1.5px solid #e2e8f0;
-		border-radius: 12px;
-		padding: 0 14px;
+		height: 52px;
+		border: 2px solid #e8edf3;
+		border-radius: 14px;
+		padding: 0 16px;
 		font-size: 16px;
 		outline: none;
 		color: #0f172a;
@@ -195,22 +235,23 @@
 	}
 	input:focus {
 		border-color: #2563eb;
-		box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+		box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 		background: #fff;
 	}
 
 	.phone-input {
 		text-align: left;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.1em;
 		font-family: 'Courier New', monospace;
-		font-size: 18px;
+		font-size: 20px;
+		font-weight: 600;
 	}
 
 	.otp-input {
-		letter-spacing: 0.6em;
-		font-size: 26px;
+		letter-spacing: 0.7em;
+		font-size: 28px;
 		text-align: center;
-		font-weight: 700;
+		font-weight: 800;
 		padding: 0 10px;
 	}
 
@@ -219,52 +260,63 @@
 		font-size: 13px;
 		color: #475569;
 		background: #f0fdf4;
-		border: 1px solid #bbf7d0;
-		border-radius: 8px;
-		padding: 9px 14px;
+		border: 1.5px solid #bbf7d0;
+		border-radius: 12px;
+		padding: 11px 16px;
+		font-weight: 500;
 	}
 
 	.btn-primary {
-		height: 48px;
-		background: #2563eb;
+		height: 52px;
+		background: linear-gradient(135deg, #2563eb, #1d4ed8);
 		color: #fff;
-		border-radius: 12px;
+		border-radius: 14px;
 		font-size: 16px;
-		font-weight: 600;
+		font-weight: 700;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: background 0.15s;
+		transition: transform 0.12s, box-shadow 0.15s;
 		border: none;
 		cursor: pointer;
+		box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+		letter-spacing: 0.2px;
 	}
-	.btn-primary:hover:not(:disabled) { background: #1d4ed8; }
-	.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+	.btn-primary:hover:not(:disabled) {
+		transform: translateY(-1px);
+		box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+	}
+	.btn-primary:active:not(:disabled) { transform: translateY(0); }
+	.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
 	.btn-ghost {
-		height: 40px;
+		height: 46px;
 		background: none;
 		color: #64748b;
-		border: none;
+		border: 1.5px solid #e2e8f0;
+		border-radius: 12px;
 		font-size: 14px;
+		font-weight: 500;
 		cursor: pointer;
 		text-align: center;
+		transition: border-color 0.15s, color 0.15s, background 0.15s;
 	}
-	.btn-ghost:hover { color: #1e293b; }
+	.btn-ghost:hover { border-color: #94a3b8; color: #1e293b; background: #f8fafc; }
 
 	.error {
 		background: #fef2f2;
 		color: #b91c1c;
-		border: 1px solid #fecaca;
-		border-radius: 8px;
-		padding: 8px 12px;
+		border: 1.5px solid #fecaca;
+		border-radius: 10px;
+		padding: 10px 14px;
 		font-size: 13px;
+		font-weight: 500;
 	}
 
 	.spinner {
-		width: 18px;
-		height: 18px;
-		border: 2px solid rgba(255, 255, 255, 0.35);
+		width: 20px;
+		height: 20px;
+		border: 2.5px solid rgba(255, 255, 255, 0.35);
 		border-top-color: #fff;
 		border-radius: 50%;
 		animation: spin 0.7s linear infinite;
@@ -272,6 +324,6 @@
 	@keyframes spin { to { transform: rotate(360deg); } }
 
 	@media (max-width: 420px) {
-		.card { padding: 28px 20px; }
+		.card { padding: 30px 20px; }
 	}
 </style>

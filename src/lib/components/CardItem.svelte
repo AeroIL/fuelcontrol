@@ -29,7 +29,14 @@
 	$: slice = (d.usedLiters || 0) + (d.remainingLiters || 0);
 	$: remainPct = slice > 0 ? Math.min(100, (d.remainingLiters / slice) * 100) : 0;
 	$: gaugeColor =
-		remainPct > 50 ? '#16a34a' : remainPct > 25 ? '#ea580c' : '#dc2626';
+		remainPct > 50 ? '#059669' : remainPct > 25 ? '#d97706' : '#dc2626';
+
+	$: accentColor = (() => {
+		const n = (d?.cardName || '').toLowerCase();
+		if (/סולר|diesel/i.test(n)) return '#f59e0b';
+		if (/95|בנזין|gasoline/i.test(n)) return '#3b82f6';
+		return '#94a3b8';
+	})();
 
 	function fmt(n: number): string {
 		if (n == null || isNaN(n)) return '—';
@@ -79,7 +86,8 @@
 	}
 </script>
 
-<article class="card" class:refreshing>
+<article class="card" class:refreshing style="--accent: {accentColor}">
+	<div class="accent-bar"></div>
 
 	<!-- top bar: name + actions -->
 	<header class="card-top">
@@ -234,17 +242,26 @@
 <style>
 	.card {
 		background: #fff;
-		border-radius: 14px;
+		border-radius: 16px;
 		border: 1px solid #e8edf3;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
-		transition: box-shadow 0.18s;
+		transition: box-shadow 0.2s, transform 0.15s;
+		box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.06);
 	}
 	.card:hover {
-		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 4px 8px rgba(0,0,0,0.07), 0 16px 40px rgba(0,0,0,0.1);
+		transform: translateY(-1px);
 	}
-	.card.refreshing { opacity: 0.6; pointer-events: none; }
+	.card.refreshing { opacity: 0.55; pointer-events: none; }
+
+	/* accent top bar */
+	.accent-bar {
+		height: 4px;
+		background: var(--accent, #e2e8f0);
+		flex-shrink: 0;
+	}
 
 	/* top bar */
 	.card-top {
@@ -253,7 +270,6 @@
 		justify-content: space-between;
 		padding: 12px 14px 10px;
 		gap: 8px;
-		border-bottom: 1px solid #f1f5f9;
 	}
 	.name-btn {
 		display: inline-flex;
@@ -263,102 +279,108 @@
 		font-weight: 600;
 		color: #1e293b;
 		background: none;
-		padding: 2px 4px;
-		border-radius: 4px;
+		padding: 3px 6px;
+		border-radius: 6px;
 		max-width: 100%;
 		text-align: right;
-		transition: background 0.13s;
+		transition: background 0.12s;
 	}
 	.name-btn:hover { background: #f1f5f9; }
 	.name-btn .muted { color: #94a3b8; font-weight: 400; font-style: italic; }
 	.name-input {
-		border: 1.5px solid #93c5fd;
-		border-radius: 6px;
-		font-size: 16px;
-		padding: 4px 8px;
+		border: 2px solid #93c5fd;
+		border-radius: 8px;
+		font-size: 15px;
+		padding: 5px 10px;
 		width: 100%;
 		outline: none;
 		color: #1e293b;
+		background: #f8fafc;
 	}
-	.name-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+	.name-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
 
 	/* actions */
 	.actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 	.icon-btn {
-		width: 30px; height: 30px;
-		border-radius: 7px;
+		width: 32px; height: 32px;
+		border-radius: 8px;
 		display: flex; align-items: center; justify-content: center;
-		color: #64748b;
+		color: #94a3b8;
 		background: none;
 		transition: background 0.13s, color 0.13s;
 	}
-	.icon-btn:hover:not(:disabled) { background: #f1f5f9; color: #1e293b; }
+	.icon-btn:hover:not(:disabled) { background: #f1f5f9; color: #334155; }
 	.icon-btn.danger:hover:not(:disabled) { background: #fee2e2; color: #dc2626; }
-	.icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+	.icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 	.spin svg { animation: spin 0.8s linear infinite; }
 	@keyframes spin { to { transform: rotate(360deg); } }
 
 	.del-row {
-		display: flex; align-items: center; gap: 4px;
-		background: #fef2f2; border-radius: 7px;
-		padding: 3px 8px; font-size: 12px; color: #b91c1c;
+		display: flex; align-items: center; gap: 5px;
+		background: #fef2f2; border-radius: 8px;
+		padding: 4px 10px; font-size: 12px; color: #b91c1c;
+		font-weight: 600;
 	}
 	.btn-yes {
 		background: #dc2626; color: #fff;
-		border-radius: 4px; padding: 2px 8px;
-		font-size: 12px; font-weight: 600;
+		border-radius: 5px; padding: 2px 9px;
+		font-size: 12px; font-weight: 700;
 	}
 	.btn-no {
 		background: #f1f5f9; color: #475569;
-		border-radius: 4px; padding: 2px 8px; font-size: 12px;
+		border-radius: 5px; padding: 2px 9px; font-size: 12px;
 	}
 
 	/* id strip */
 	.id-strip {
 		display: flex; align-items: center; justify-content: space-between;
-		padding: 7px 14px;
-		background: #f8fafc;
-		border-bottom: 1px solid #f1f5f9;
+		padding: 6px 14px 8px;
+		gap: 8px;
 	}
 	.card-id {
 		font-family: 'Courier New', monospace;
-		font-size: 13px; font-weight: 700;
-		color: #475569; letter-spacing: 0.5px;
+		font-size: 12px; font-weight: 700;
+		color: #94a3b8; letter-spacing: 0.5px;
 	}
-	.badges { display: flex; gap: 5px; }
+	.badges { display: flex; gap: 4px; flex-wrap: wrap; }
 	.badge {
 		font-size: 11px; font-weight: 600;
-		padding: 2px 8px; border-radius: 20px;
-		background: #e2e8f0; color: #475569;
+		padding: 2px 9px; border-radius: 20px;
+		background: #f1f5f9; color: #64748b;
+		white-space: nowrap;
 	}
-	.badge.active { background: #dcfce7; color: #15803d; }
+	.badge.active { background: #dcfce7; color: #059669; }
+	.badge.fuel-diesel { background: #fef3c7; color: #92400e; }
+	.badge.fuel-95 { background: #dbeafe; color: #1e40af; }
 
 	/* fuel section */
 	.fuel-section {
-		padding: 14px 14px 10px;
+		padding: 14px 16px 12px;
+		background: #fafbfc;
+		border-top: 1px solid #f1f5f9;
 		border-bottom: 1px solid #f1f5f9;
 	}
 	.fuel-row {
 		display: flex; justify-content: space-between; align-items: baseline;
-		margin-bottom: 8px;
+		margin-bottom: 10px;
 	}
-	.fuel-label { font-size: 13px; color: #64748b; font-weight: 500; }
-	.fuel-val { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+	.fuel-label { font-size: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+	.fuel-val { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
 	.gauge-track {
-		height: 7px; background: #e2e8f0; border-radius: 99px; overflow: hidden;
+		height: 8px; background: #e8edf3; border-radius: 99px; overflow: hidden;
 	}
 	.gauge-fill {
 		height: 100%; border-radius: 99px;
-		transition: width 0.4s ease;
+		transition: width 0.5s ease;
 	}
 	.fuel-sub {
 		display: flex; justify-content: space-between;
-		font-size: 11px; color: #94a3b8; margin-top: 5px;
+		font-size: 11px; color: #94a3b8; margin-top: 6px; font-weight: 500;
 	}
 
 	/* last section */
 	.last-section {
-		padding: 12px 14px;
+		padding: 12px 16px;
 		border-bottom: 1px solid #f1f5f9;
 	}
 	.section-label {
@@ -371,24 +393,20 @@
 		margin-bottom: 4px;
 	}
 	.last-date { font-size: 14px; font-weight: 600; color: #1e293b; }
-	.last-liters { font-size: 16px; font-weight: 700; color: #1d4ed8; }
-	.last-station { font-size: 13px; color: #475569; margin-bottom: 2px; }
+	.last-liters { font-size: 16px; font-weight: 700; color: #2563eb; }
+	.last-station { font-size: 12px; color: #64748b; margin-bottom: 2px; }
 	.last-vehicle { font-size: 12px; color: #94a3b8; }
-
-	/* fuel type badges */
-	.badge.fuel-diesel { background: #fef9c3; color: #713f12; }
-	.badge.fuel-95 { background: #dbeafe; color: #1e40af; }
 
 	/* transactions dropdown */
 	.tx-section { border-top: 1px solid #f1f5f9; }
 	.tx-toggle {
 		width: 100%; display: flex; justify-content: space-between; align-items: center;
-		padding: 10px 14px; font-size: 13px; font-weight: 600; color: #475569;
+		padding: 10px 16px; font-size: 13px; font-weight: 600; color: #64748b;
 		background: none; text-align: right;
-		transition: background 0.13s;
+		transition: background 0.13s, color 0.13s;
 	}
-	.tx-toggle:hover { background: #f8fafc; }
-	.chevron { font-size: 16px; transition: transform 0.2s; display: inline-block; }
+	.tx-toggle:hover { background: #f8fafc; color: #334155; }
+	.chevron { font-size: 14px; transition: transform 0.2s; display: inline-block; }
 	.chevron.open { transform: rotate(180deg); }
 
 	.tx-table-wrap {
@@ -398,8 +416,7 @@
 		scrollbar-width: thin;
 		scrollbar-color: #e2e8f0 transparent;
 	}
-	.tx-table-wrap::-webkit-scrollbar { height: 4px; }
-	.tx-table-wrap::-webkit-scrollbar-track { background: transparent; }
+	.tx-table-wrap::-webkit-scrollbar { height: 3px; }
 	.tx-table-wrap::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
 	.tx-table {
 		width: 100%; border-collapse: collapse;
@@ -407,38 +424,35 @@
 	}
 	.tx-table thead tr { background: #f8fafc; }
 	.tx-table th {
-		padding: 7px 10px; font-size: 11px; font-weight: 700;
+		padding: 8px 10px; font-size: 10px; font-weight: 700;
 		color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;
 		white-space: nowrap;
 	}
-	.tx-table tbody tr { border-top: 1px solid #f1f5f9; transition: background 0.1s; }
+	.tx-table tbody tr { border-top: 1px solid #f8fafc; transition: background 0.1s; }
 	.tx-table tbody tr:hover { background: #f8fafc; }
-	.tx-table td { padding: 7px 10px; color: #475569; vertical-align: middle; }
+	.tx-table td { padding: 8px 10px; color: #475569; vertical-align: middle; }
 	.col-date { white-space: nowrap; color: #64748b; font-size: 11px; }
 	.col-time { display: block; color: #94a3b8; font-size: 10px; }
-	.col-vehicle { font-family: 'Courier New', monospace; font-weight: 600; color: #1e293b; white-space: nowrap; }
+	.col-vehicle { font-family: 'Courier New', monospace; font-weight: 700; color: #1e293b; white-space: nowrap; }
 	.col-station { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.branch { display: block; font-size: 10px; color: #94a3b8; }
-	.col-fuel { white-space: nowrap; color: #475569; }
+	.col-fuel { white-space: nowrap; }
 	.col-type { white-space: nowrap; color: #94a3b8; font-size: 11px; }
-	.col-liters { font-weight: 700; color: #1d4ed8; white-space: nowrap; text-align: left; }
+	.col-liters { font-weight: 700; color: #2563eb; white-space: nowrap; text-align: left; }
 
 	/* footer */
-	.card-footer {
-		padding: 8px 14px;
-	}
-	.updated { font-size: 11px; color: #cbd5e1; }
+	.card-footer { padding: 8px 16px; }
+	.updated { font-size: 11px; color: #cbd5e1; font-weight: 500; }
 
 	/* ── Mobile responsive ── */
 	@media (max-width: 480px) {
 		.card-top { padding: 10px 12px 8px; }
-		.id-strip { padding: 6px 12px; }
-		.fuel-section { padding: 12px 12px 8px; }
-		.fuel-val { font-size: 20px; }
+		.id-strip { padding: 5px 12px 7px; }
+		.fuel-section { padding: 12px 12px 10px; }
+		.fuel-val { font-size: 22px; }
 		.last-section { padding: 10px 12px; }
-		.tx-toggle { padding: 9px 12px; font-size: 12px; }
+		.tx-toggle { padding: 9px 12px; }
 		.tx-table th, .tx-table td { padding: 6px 8px; }
-		/* Hide חברה and סוג columns on mobile to fit the table */
 		.tx-table th:nth-child(4),
 		.tx-table td:nth-child(4),
 		.tx-table th:nth-child(5),
@@ -446,4 +460,6 @@
 		.card-footer { padding: 7px 12px; }
 	}
 </style>
+
+
 

@@ -1,18 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 :root {
 	--primary: #2563eb;
 	--primary-light: #3b82f6;
 	--primary-dark: #1d4ed8;
-	--success: #16a34a;
-	--error: #b91c1c;
-	--warning: #f59e0b;
-	--bg: #f1f5f9;
+	--success: #059669;
+	--error: #dc2626;
+	--warning: #d97706;
+	--bg: #eef2f7;
 	--card-bg: #ffffff;
 	--text: #0f172a;
 	--text-muted: #64748b;
-	--border: #e8edf3;
-	--shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 4px 12px rgba(0, 0, 0, 0.05);
-	--radius: 14px;
-	--radius-sm: 8px;
+	--border: #e2e8f0;
+	--shadow-sm: 0 1px 2px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.04);
+	--shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.07);
+	--shadow-lg: 0 4px 8px rgba(0,0,0,0.06), 0 16px 40px rgba(0,0,0,0.12);
+	--radius: 16px;
+	--radius-sm: 10px;
 }
 
 *,
@@ -30,7 +34,7 @@ html {
 }
 
 body {
-	font-family: 'Segoe UI', 'Arial', sans-serif;
+	font-family: 'Inter', 'Segoe UI', 'Arial', sans-serif;
 	background: var(--bg);
 	color: var(--text);
 	direction: rtl;
@@ -38,6 +42,7 @@ body {
 	min-height: 100vh;
 	overflow-x: hidden;
 	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 	line-height: 1.5;
 }
 
