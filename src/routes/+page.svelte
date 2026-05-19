@@ -45,7 +45,7 @@
 		if (fuelFilter === 'diesel' && !/סולר|diesel/i.test(name)) return false;
 		if (fuelFilter === 'gasoline' && !/בנזין|gasoline|95/i.test(name)) return false;
 		const rem = Number(c.data?.remainingLiters ?? 0);
-		if (fillFilter === 'full' && rem <= 50) return false;
+		if (fillFilter === 'full' && rem < 50) return false;
 		if (fillFilter === 'partial' && (rem < 1 || rem >= 50)) return false;
 		if (fillFilter === 'empty' && rem >= 1) return false;
 		return true;
@@ -412,8 +412,8 @@
 				<div class="filter-group">
 					<span class="filter-label">מילוי</span>
 					<button class="filter-btn" class:active={fillFilter === 'all'} on:click={() => (fillFilter = 'all')}>הכל</button>
-					<button class="filter-btn full" class:active={fillFilter === 'full'} on:click={() => (fillFilter = 'full')}>מלא &gt;50ל'</button>
-					<button class="filter-btn partial" class:active={fillFilter === 'partial'} on:click={() => (fillFilter = 'partial')}>1–50ל'</button>
+					<button class="filter-btn full" class:active={fillFilter === 'full'} on:click={() => (fillFilter = 'full')}>מלא ≥50ל'</button>
+					<button class="filter-btn partial" class:active={fillFilter === 'partial'} on:click={() => (fillFilter = 'partial')}>שומשו 1–49ל'</button>
 					<button class="filter-btn empty" class:active={fillFilter === 'empty'} on:click={() => (fillFilter = 'empty')}>ריק &lt;1ל'</button>
 				</div>
 				<span class="filter-count">{filteredCards.length} / {cards.length}</span>

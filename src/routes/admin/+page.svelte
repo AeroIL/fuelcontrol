@@ -5,9 +5,11 @@
 	export let data: PageData;
 	export let form: ActionData;
 
-	$: af = form as { numbers1?: string[]; numbers2?: string[]; error?: string } | null;
-	$: numbers1 = af?.numbers1 ?? data.numbers1;
-	$: numbers2 = af?.numbers2 ?? data.numbers2;
+	type Entry = { phone: string; name: string };
+	type AF = { entries1?: Entry[]; entries2?: Entry[]; error?: string } | null;
+	$: af = form as AF;
+	$: entries1 = af?.entries1 ?? data.entries1;
+	$: entries2 = af?.entries2 ?? data.entries2;
 
 	let adding1 = false;
 	let adding2 = false;
@@ -32,10 +34,16 @@
 			<p class="error">{af.error}</p>
 		{/if}
 
+		<!-- ── Admin section ── -->
+		<div class="base-header admin-row">
+			<span class="base-badge admin-badge-section">מנהל מערכת</span>
+			<span class="base-count">0524746673 · גישה לכל הבסיסים</span>
+		</div>
+
 		<!-- ── Base 1 ── -->
 		<div class="base-header base1">
 			<span class="base-badge">בסיס 1</span>
-			<span class="base-count">{numbers1.length} מספרים</span>
+			<span class="base-count">{entries1.length} מספרים</span>
 		</div>
 
 		<div class="panel">
@@ -49,6 +57,7 @@
 				}}
 			>
 				<div class="add-row">
+					<input name="name" type="text" placeholder="שם (אופציונלי)" maxlength="60" class="input-name" />
 					<input name="phone" type="tel" inputmode="numeric" placeholder="05XXXXXXXX" maxlength="15" required dir="ltr" />
 					<button type="submit" class="btn-add" disabled={adding1}>{adding1 ? '...' : 'הוסף'}</button>
 				</div>
@@ -56,33 +65,36 @@
 		</div>
 
 		<div class="panel">
-			<h2 class="panel-title">מספרים מורשים – בסיס 1 ({numbers1.length})</h2>
-			<ul class="number-list">
-				{#each numbers1 as n (n)}
-					<li class="number-item">
-						<span class="number" dir="ltr">{n}</span>
-						{#if n === '0524746673'}
-							<span class="admin-badge">מנהל</span>
-						{:else}
+			<h2 class="panel-title">מספרים מורשים – בסיס 1 ({entries1.length})</h2>
+			{#if entries1.length === 0}
+				<p class="empty-note">אין מספרים בבסיס 1 עדיין</p>
+			{:else}
+				<ul class="number-list">
+					{#each entries1 as e (e.phone)}
+						<li class="number-item">
+							<div class="entry-info">
+								{#if e.name}<span class="entry-name">{e.name}</span>{/if}
+								<span class="number" dir="ltr">{e.phone}</span>
+							</div>
 							<form method="POST" action="?/remove1" use:enhance={() => {
-								removing = n;
+								removing = e.phone;
 								return async ({ update }) => { removing = ''; await update(); };
 							}}>
-								<input type="hidden" name="phone" value={n} />
-								<button type="submit" class="btn-remove" disabled={removing === n}>
-									{removing === n ? '...' : 'הסר'}
+								<input type="hidden" name="phone" value={e.phone} />
+								<button type="submit" class="btn-remove" disabled={removing === e.phone}>
+									{removing === e.phone ? '...' : 'הסר'}
 								</button>
 							</form>
-						{/if}
-					</li>
-				{/each}
-			</ul>
+						</li>
+					{/each}
+				</ul>
+			{/if}
 		</div>
 
 		<!-- ── Base 2 ── -->
 		<div class="base-header base2">
 			<span class="base-badge">בסיס 2</span>
-			<span class="base-count">{numbers2.length} מספרים</span>
+			<span class="base-count">{entries2.length} מספרים</span>
 		</div>
 
 		<div class="panel">
@@ -96,6 +108,7 @@
 				}}
 			>
 				<div class="add-row">
+					<input name="name" type="text" placeholder="שם (אופציונלי)" maxlength="60" class="input-name" />
 					<input name="phone" type="tel" inputmode="numeric" placeholder="05XXXXXXXX" maxlength="15" required dir="ltr" />
 					<button type="submit" class="btn-add btn-add-2" disabled={adding2}>{adding2 ? '...' : 'הוסף'}</button>
 				</div>
@@ -103,21 +116,24 @@
 		</div>
 
 		<div class="panel">
-			<h2 class="panel-title">מספרים מורשים – בסיס 2 ({numbers2.length})</h2>
-			{#if numbers2.length === 0}
+			<h2 class="panel-title">מספרים מורשים – בסיס 2 ({entries2.length})</h2>
+			{#if entries2.length === 0}
 				<p class="empty-note">אין מספרים בבסיס 2 עדיין</p>
 			{:else}
 				<ul class="number-list">
-					{#each numbers2 as n (n)}
+					{#each entries2 as e (e.phone)}
 						<li class="number-item">
-							<span class="number" dir="ltr">{n}</span>
+							<div class="entry-info">
+								{#if e.name}<span class="entry-name">{e.name}</span>{/if}
+								<span class="number" dir="ltr">{e.phone}</span>
+							</div>
 							<form method="POST" action="?/remove2" use:enhance={() => {
-								removing = n;
+								removing = e.phone;
 								return async ({ update }) => { removing = ''; await update(); };
 							}}>
-								<input type="hidden" name="phone" value={n} />
-								<button type="submit" class="btn-remove" disabled={removing === n}>
-									{removing === n ? '...' : 'הסר'}
+								<input type="hidden" name="phone" value={e.phone} />
+								<button type="submit" class="btn-remove" disabled={removing === e.phone}>
+									{removing === e.phone ? '...' : 'הסר'}
 								</button>
 							</form>
 						</li>
@@ -184,6 +200,7 @@
 	}
 	.base1 .base-badge { background: #dbeafe; color: #1d4ed8; }
 	.base2 .base-badge { background: #ede9fe; color: #6d28d9; }
+	.admin-row .base-badge { background: #fef3c7; color: #92400e; }
 	.base-count { font-size: 12px; color: #94a3b8; font-weight: 600; }
 
 	.panel {
@@ -202,7 +219,14 @@
 	}
 	.add-row {
 		display: flex;
-		gap: 10px;
+		gap: 8px;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+	.input-name {
+		flex: 1;
+		min-width: 120px;
+		max-width: 180px;
 	}
 	input {
 		flex: 1;
@@ -250,34 +274,31 @@
 		padding: 8px 0;
 	}
 
-	.number-list {
-		list-style: none;
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
 	.number-item {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		background: #f8fafc;
-		border-radius: 10px;
-		padding: 10px 14px;
-		gap: 8px;
+		gap: 10px;
+		padding: 10px 0;
+		border-bottom: 1px solid #f1f5f9;
+	}
+	.number-item:last-child { border-bottom: none; }
+	.entry-info {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		min-width: 0;
+	}
+	.entry-name {
+		font-size: 13px;
+		font-weight: 700;
+		color: #1e293b;
 	}
 	.number {
 		font-family: 'Courier New', monospace;
-		font-size: 15px;
+		font-size: 13px;
 		font-weight: 600;
-		color: #1e293b;
-	}
-	.admin-badge {
-		font-size: 11px;
-		font-weight: 700;
-		background: #dbeafe;
-		color: #1d4ed8;
-		border-radius: 20px;
-		padding: 2px 10px;
+		color: #64748b;
 	}
 	.btn-remove {
 		font-size: 12px;
@@ -289,7 +310,14 @@
 		padding: 4px 12px;
 		cursor: pointer;
 		transition: background 0.15s;
+		flex-shrink: 0;
 	}
 	.btn-remove:hover:not(:disabled) { background: #fee2e2; }
 	.btn-remove:disabled { opacity: 0.6; cursor: not-allowed; }
+
+	.number-list {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+	}
 </style>
