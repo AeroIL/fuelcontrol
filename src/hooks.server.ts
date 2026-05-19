@@ -1,7 +1,7 @@
 import type { Handle } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { parseSession, COOKIE_NAME } from '$lib/server/auth';
-import { getPhoneBase, getPhoneBases } from '$lib/server/whitelist';
+import { getPhoneBases } from '$lib/server/whitelist';
 
 // Paths that don't require authentication
 const PUBLIC_PREFIXES = ['/auth', '/api/auth/'];

@@ -1,4 +1,4 @@
-import { createHmac, randomInt } from 'crypto';
+import { createHmac, randomInt, timingSafeEqual } from 'crypto';
 
 export const COOKIE_NAME = 'fuel_session';
 export const ADMIN_PHONE = '0524746673';
@@ -53,7 +53,10 @@ export function parseSession(token: string): string | null {
 		if (dot === -1) return null;
 		const encoded = token.slice(0, dot);
 		const sig = token.slice(dot + 1);
-		if (sign(encoded) !== sig) return null;
+		const expected = sign(encoded);
+		// Constant-time comparison to prevent timing attacks
+		if (sig.length !== expected.length) return null;
+		if (!timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
 		const { phone, expires } = JSON.parse(Buffer.from(encoded, 'base64url').toString());
 		if (Date.now() > expires) return null;
 		return typeof phone === 'string' ? phone : null;

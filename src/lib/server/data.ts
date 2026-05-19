@@ -11,7 +11,7 @@
  * per-base files automatically so no data is lost.
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync } from 'fs';
 import { join } from 'path';
 import type { SavedCard } from '$lib/types';
 
@@ -138,8 +138,10 @@ export function readData(): AppData {
 	}
 }
 
-/** Atomically write all app data to data.json. */
+/** Atomically write all app data to data.json (write-then-rename prevents corruption on crash). */
 export function writeData(data: AppData): void {
 	ensureDir();
-	writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+	const tmp = DATA_FILE + '.tmp';
+	writeFileSync(tmp, JSON.stringify(data, null, 2));
+	renameSync(tmp, DATA_FILE);
 }

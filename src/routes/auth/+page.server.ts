@@ -1,13 +1,12 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { generateOtp, storeOtp, verifyOtp, createSession, COOKIE_NAME } from '$lib/server/auth';
+import { generateOtp, storeOtp, verifyOtp, createSession, parseSession, COOKIE_NAME } from '$lib/server/auth';
 import { isWhitelisted } from '$lib/server/whitelist';
 import { sendOtp } from '$lib/server/sms';
 import { normalizePhone } from '$lib/server/sms';
 
 export const load: PageServerLoad = async ({ cookies }) => {
 	// Already has a valid session? Redirect home
-	const { parseSession } = await import('$lib/server/auth');
 	const token = cookies.get(COOKIE_NAME) ?? '';
 	if (token && parseSession(token)) {
 		throw redirect(302, '/');

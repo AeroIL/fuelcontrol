@@ -3,14 +3,15 @@ import type { Actions, PageServerLoad } from './$types';
 import { ADMIN_PHONE } from '$lib/server/auth';
 import { readWhitelist, writeWhitelist, type WhitelistEntry } from '$lib/server/whitelist';
 import { readBases, addBase, removeBase, type BaseConfig } from '$lib/server/bases';
+import { readData } from '$lib/server/data';
 import { deleteBaseData } from '$lib/server/storage';
 import { normalizePhone } from '$lib/server/sms';
 
 function loadAll(): { bases: BaseConfig[]; entries: Record<string, WhitelistEntry[]> } {
-	const bases = readBases();
+	const data = readData(); // single read instead of N+1
 	const entries: Record<string, WhitelistEntry[]> = {};
-	for (const b of bases) entries[b.id] = readWhitelist(b.id);
-	return { bases, entries };
+	for (const b of data.bases) entries[b.id] = data.whitelist[b.id] ?? [];
+	return { bases: data.bases, entries };
 }
 
 export const load: PageServerLoad = async ({ locals }) => {
