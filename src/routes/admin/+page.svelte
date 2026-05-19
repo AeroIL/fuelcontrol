@@ -5,9 +5,12 @@
 	export let data: PageData;
 	export let form: ActionData;
 
-	$: af = form as { numbers?: string[]; error?: string } | null;
-	$: numbers = af?.numbers ?? data.numbers;
-	let adding = false;
+	$: af = form as { numbers1?: string[]; numbers2?: string[]; error?: string } | null;
+	$: numbers1 = af?.numbers1 ?? data.numbers1;
+	$: numbers2 = af?.numbers2 ?? data.numbers2;
+
+	let adding1 = false;
+	let adding2 = false;
 	let removing = '';
 </script>
 
@@ -25,55 +28,46 @@
 			<a href="/" class="btn-back">← חזרה</a>
 		</header>
 
-		<!-- Add number -->
+		{#if af?.error}
+			<p class="error">{af.error}</p>
+		{/if}
+
+		<!-- ── Base 1 ── -->
+		<div class="base-header base1">
+			<span class="base-badge">בסיס 1</span>
+			<span class="base-count">{numbers1.length} מספרים</span>
+		</div>
+
 		<div class="panel">
-			<h2 class="panel-title">הוסף מספר לרשימה</h2>
+			<h2 class="panel-title">הוסף מספר לבסיס 1</h2>
 			<form
 				method="POST"
-				action="?/add"
+				action="?/add1"
 				use:enhance={() => {
-					adding = true;
-					return async ({ update }) => { adding = false; await update(); };
+					adding1 = true;
+					return async ({ update }) => { adding1 = false; await update(); };
 				}}
 			>
 				<div class="add-row">
-					<input
-						name="phone"
-						type="tel"
-						inputmode="numeric"
-						placeholder="05XXXXXXXX"
-						maxlength="15"
-						required
-						dir="ltr"
-					/>
-					<button type="submit" class="btn-add" disabled={adding}>
-						{adding ? '...' : 'הוסף'}
-					</button>
+					<input name="phone" type="tel" inputmode="numeric" placeholder="05XXXXXXXX" maxlength="15" required dir="ltr" />
+					<button type="submit" class="btn-add" disabled={adding1}>{adding1 ? '...' : 'הוסף'}</button>
 				</div>
 			</form>
-			{#if af?.error}
-				<p class="error">{af.error}</p>
-			{/if}
 		</div>
 
-		<!-- Whitelist -->
 		<div class="panel">
-			<h2 class="panel-title">מספרים מורשים ({numbers.length})</h2>
+			<h2 class="panel-title">מספרים מורשים – בסיס 1 ({numbers1.length})</h2>
 			<ul class="number-list">
-				{#each numbers as n (n)}
+				{#each numbers1 as n (n)}
 					<li class="number-item">
 						<span class="number" dir="ltr">{n}</span>
 						{#if n === '0524746673'}
 							<span class="admin-badge">מנהל</span>
 						{:else}
-							<form
-								method="POST"
-								action="?/remove"
-								use:enhance={() => {
-									removing = n;
-									return async ({ update }) => { removing = ''; await update(); };
-								}}
-							>
+							<form method="POST" action="?/remove1" use:enhance={() => {
+								removing = n;
+								return async ({ update }) => { removing = ''; await update(); };
+							}}>
 								<input type="hidden" name="phone" value={n} />
 								<button type="submit" class="btn-remove" disabled={removing === n}>
 									{removing === n ? '...' : 'הסר'}
@@ -83,6 +77,53 @@
 					</li>
 				{/each}
 			</ul>
+		</div>
+
+		<!-- ── Base 2 ── -->
+		<div class="base-header base2">
+			<span class="base-badge">בסיס 2</span>
+			<span class="base-count">{numbers2.length} מספרים</span>
+		</div>
+
+		<div class="panel">
+			<h2 class="panel-title">הוסף מספר לבסיס 2</h2>
+			<form
+				method="POST"
+				action="?/add2"
+				use:enhance={() => {
+					adding2 = true;
+					return async ({ update }) => { adding2 = false; await update(); };
+				}}
+			>
+				<div class="add-row">
+					<input name="phone" type="tel" inputmode="numeric" placeholder="05XXXXXXXX" maxlength="15" required dir="ltr" />
+					<button type="submit" class="btn-add btn-add-2" disabled={adding2}>{adding2 ? '...' : 'הוסף'}</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="panel">
+			<h2 class="panel-title">מספרים מורשים – בסיס 2 ({numbers2.length})</h2>
+			{#if numbers2.length === 0}
+				<p class="empty-note">אין מספרים בבסיס 2 עדיין</p>
+			{:else}
+				<ul class="number-list">
+					{#each numbers2 as n (n)}
+						<li class="number-item">
+							<span class="number" dir="ltr">{n}</span>
+							<form method="POST" action="?/remove2" use:enhance={() => {
+								removing = n;
+								return async ({ update }) => { removing = ''; await update(); };
+							}}>
+								<input type="hidden" name="phone" value={n} />
+								<button type="submit" class="btn-remove" disabled={removing === n}>
+									{removing === n ? '...' : 'הסר'}
+								</button>
+							</form>
+						</li>
+					{/each}
+				</ul>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -100,7 +141,7 @@
 		margin: 0 auto;
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
+		gap: 16px;
 	}
 	.top-bar {
 		display: flex;
@@ -127,6 +168,23 @@
 		white-space: nowrap;
 	}
 	.btn-back:hover { background: #f8fafc; }
+
+	.base-header {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 2px 0;
+	}
+	.base-badge {
+		font-size: 12px;
+		font-weight: 800;
+		border-radius: 20px;
+		padding: 3px 12px;
+		letter-spacing: 0.3px;
+	}
+	.base1 .base-badge { background: #dbeafe; color: #1d4ed8; }
+	.base2 .base-badge { background: #ede9fe; color: #6d28d9; }
+	.base-count { font-size: 12px; color: #94a3b8; font-weight: 600; }
 
 	.panel {
 		background: #fff;
@@ -173,6 +231,8 @@
 	}
 	.btn-add:hover:not(:disabled) { background: #1d4ed8; }
 	.btn-add:disabled { opacity: 0.6; cursor: not-allowed; }
+	.btn-add-2 { background: #7c3aed; }
+	.btn-add-2:hover:not(:disabled) { background: #6d28d9; }
 
 	.error {
 		background: #fef2f2;
@@ -181,6 +241,13 @@
 		border-radius: 8px;
 		padding: 8px 12px;
 		font-size: 13px;
+	}
+
+	.empty-note {
+		font-size: 13px;
+		color: #94a3b8;
+		text-align: center;
+		padding: 8px 0;
 	}
 
 	.number-list {
@@ -221,12 +288,8 @@
 		border-radius: 8px;
 		padding: 4px 12px;
 		cursor: pointer;
-		white-space: nowrap;
+		transition: background 0.15s;
 	}
 	.btn-remove:hover:not(:disabled) { background: #fee2e2; }
-	.btn-remove:disabled { opacity: 0.5; }
-
-	@media (max-width: 480px) {
-		.logo h1 { font-size: 15px; }
-	}
+	.btn-remove:disabled { opacity: 0.6; cursor: not-allowed; }
 </style>
