@@ -3,6 +3,7 @@ declare global {
 		interface Locals {
 			phone: string | null;
 			base: string | null;
+			userBases: string[];
 		}
 	}
 }

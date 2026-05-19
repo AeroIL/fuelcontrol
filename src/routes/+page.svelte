@@ -9,15 +9,19 @@
 	$: phone = data.phone;
 	$: isAdmin = data.isAdmin;
 
-	// Admin can switch which base they're viewing
+	// Admin or multi-base users can switch which base they're viewing
+	$: canSwitch = isAdmin || (data.userBases?.length ?? 0) > 1;
 	let viewBase: string = data.base ?? data.bases[0]?.id ?? '1';
-	$: baseParam = isAdmin ? `?base=${viewBase}` : '';
+
+	function getBaseParam(base = viewBase): string {
+		return canSwitch ? `?base=${base}` : '';
+	}
 
 	function switchBase(b: string) {
 		if (viewBase === b) return;
 		viewBase = b;
 		cards = [];
-		loadCards();
+		loadCards(b); // pass base explicitly to avoid stale closure
 	}
 
 	let cards: SavedCard[] = [];
@@ -65,9 +69,9 @@
 		await loadCards();
 	});
 
-	async function loadCards() {
+	async function loadCards(base?: string) {
 		try {
-			const res = await fetch(`/api/cards${baseParam}`);
+			const res = await fetch(`/api/cards${getBaseParam(base)}`);
 			if (res.ok) {
 				cards = await res.json();
 				// Background-refresh all saved cards silently
@@ -92,7 +96,7 @@
 				data: fuelData
 			};
 
-			const saveRes = await fetch(`/api/cards${baseParam}`, {
+			const saveRes = await fetch(`/api/cards${getBaseParam()}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(payload)
@@ -133,7 +137,7 @@
 				data: fuelData
 			};
 
-			const saveRes = await fetch(`/api/cards${baseParam}`, {
+			const saveRes = await fetch(`/api/cards${getBaseParam()}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(payload)
@@ -152,13 +156,13 @@
 	}
 
 	async function deleteCard(id: string) {
-		await fetch(`/api/cards/${encodeURIComponent(id)}${baseParam}`, { method: 'DELETE' });
+		await fetch(`/api/cards/${encodeURIComponent(id)}${getBaseParam()}`, { method: 'DELETE' });
 		cards = cards.filter((c) => c.id !== id);
 		showToast('כרטיס נמחק');
 	}
 
 	async function updateHolder(id: string, name: string) {
-		const res = await fetch(`/api/cards/${encodeURIComponent(id)}${baseParam}`, {
+		const res = await fetch(`/api/cards/${encodeURIComponent(id)}${getBaseParam()}`, {
 			method: 'PATCH',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ holderName: name })
@@ -293,9 +297,9 @@
 				</div>
 			</div>
 			<div class="header-actions">
-				{#if isAdmin}
+				{#if canSwitch}
 					<div class="base-switcher" role="group" aria-label="בחר בסיס">
-						{#each data.bases as b (b.id)}
+						{#each (isAdmin ? data.bases : data.bases.filter((b) => data.userBases.includes(b.id))) as b (b.id)}
 							<button
 								class="base-btn"
 								class:active={viewBase === b.id}

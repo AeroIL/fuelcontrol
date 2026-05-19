@@ -63,18 +63,20 @@ export function writeWhitelist(base: Base, entries: WhitelistEntry[]): void {
 	writeFileSync(primary, JSON.stringify({ entries }, null, 2));
 }
 
-/** Returns which base a phone belongs to, or null (admin is never in a base). */
-export function getPhoneBase(phone: string): Base | null {
-	if (phone === ADMIN_PHONE) return null;
+/** Returns ALL bases a phone belongs to. Admin always returns []. */
+export function getPhoneBases(phone: string): Base[] {
+	if (phone === ADMIN_PHONE) return [];
 	const bases = readBases();
-	for (const b of bases) {
-		if (readWhitelist(b.id).some((e) => e.phone === phone)) return b.id;
-	}
-	return null;
+	return bases.filter((b) => readWhitelist(b.id).some((e) => e.phone === phone)).map((b) => b.id);
 }
 
-/** Admin is always allowed; regular users must appear in a base whitelist. */
+/** Returns which base a phone belongs to, or null (admin is never in a base). */
+export function getPhoneBase(phone: string): Base | null {
+	return getPhoneBases(phone)[0] ?? null;
+}
+
+/** Admin is always allowed; regular users must appear in at least one base whitelist. */
 export function isWhitelisted(phone: string): boolean {
 	if (phone === ADMIN_PHONE) return true;
-	return getPhoneBase(phone) !== null;
+	return getPhoneBases(phone).length > 0;
 }

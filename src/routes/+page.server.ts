@@ -8,6 +8,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 		phone: locals.phone,
 		isAdmin: locals.phone === ADMIN_PHONE,
 		base: locals.base ?? bases[0]?.id ?? '1',
-		bases
+		bases,
+		userBases: locals.userBases ?? []
 	};
 };

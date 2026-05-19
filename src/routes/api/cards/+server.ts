@@ -7,8 +7,11 @@ import type { SavedCard } from '$lib/types';
 
 function resolveBase(locals: App.Locals, url: URL): string {
 	const param = url.searchParams.get('base');
-	if (locals.phone === ADMIN_PHONE && param) {
-		if (readBases().some((b) => b.id === param)) return param;
+	if (param) {
+		// Admin can view any valid base
+		if (locals.phone === ADMIN_PHONE && readBases().some((b) => b.id === param)) return param;
+		// Regular users can only view bases they belong to
+		if (locals.userBases.includes(param)) return param;
 	}
 	return locals.base ?? readBases()[0]?.id ?? '1';
 }

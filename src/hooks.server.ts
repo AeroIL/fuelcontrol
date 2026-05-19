@@ -1,7 +1,7 @@
 import type { Handle } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { parseSession, COOKIE_NAME } from '$lib/server/auth';
-import { getPhoneBase } from '$lib/server/whitelist';
+import { getPhoneBase, getPhoneBases } from '$lib/server/whitelist';
 
 // Paths that don't require authentication
 const PUBLIC_PREFIXES = ['/auth', '/api/auth/'];
@@ -13,6 +13,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (isPublic) {
 		event.locals.phone = null;
 		event.locals.base = null;
+		event.locals.userBases = [];
 		return resolve(event);
 	}
 
@@ -24,6 +25,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	event.locals.phone = phone;
-	event.locals.base = getPhoneBase(phone); // null for admin (no fixed base)
+	const userBases = getPhoneBases(phone);
+	event.locals.userBases = userBases;
+	event.locals.base = userBases[0] ?? null; // null for admin (no fixed base)
 	return resolve(event);
 };
